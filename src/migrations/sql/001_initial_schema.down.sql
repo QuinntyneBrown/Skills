@@ -1,0 +1,18 @@
+DROP TRIGGER IF EXISTS update_skill_configs_updated_at ON skill_configs;
+DROP TRIGGER IF EXISTS update_skills_updated_at ON skills;
+DROP TRIGGER IF EXISTS update_users_updated_at ON users;
+DROP FUNCTION IF EXISTS update_updated_at_column();
+DROP RULE IF EXISTS audit_logs_no_delete ON audit_logs;
+DROP RULE IF EXISTS audit_logs_no_update ON audit_logs;
+DROP TABLE IF EXISTS audit_logs CASCADE;
+DROP TABLE IF EXISTS api_keys CASCADE;
+DROP TABLE IF EXISTS skill_shares CASCADE;
+DROP TABLE IF EXISTS skill_configs CASCADE;
+DROP TABLE IF EXISTS skill_versions CASCADE;
+DROP TABLE IF EXISTS skills CASCADE;
+DROP TABLE IF EXISTS oauth_accounts CASCADE;
+DROP TABLE IF EXISTS refresh_tokens CASCADE;
+DROP TABLE IF EXISTS user_roles CASCADE;
+DROP TABLE IF EXISTS roles CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS schema_migrations CASCADE;
