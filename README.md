@@ -28,8 +28,13 @@ The documented system is intended to provide:
 - [L1 High-Level Requirements](docs/specs/L1.md)
 - [L2 Detailed Requirements](docs/specs/L2.md)
 
+### UI Design
+
+- [UI Design](docs/ui-design.pen) — visual design for the platform UI (open with Pencil)
+
 ### Detailed Feature Designs
 
+- [Design Index](docs/detailed-designs/00-index.md)
 - [01 Authentication](docs/detailed-designs/01-authentication/README.md)
 - [02 Skill CRUD and Data Model](docs/detailed-designs/02-skill-crud-data-model/README.md)
 - [03 RESTful API and Security](docs/detailed-designs/03-restful-api-security/README.md)
@@ -49,7 +54,9 @@ Each feature directory also includes supporting `.puml` diagrams under its local
 |   |-- specs/
 |   |   |-- L1.md
 |   |   `-- L2.md
+|   |-- ui-design.pen
 |   `-- detailed-designs/
+|       |-- 00-index.md
 |       |-- 01-authentication/
 |       |-- 02-skill-crud-data-model/
 |       |-- 03-restful-api-security/
