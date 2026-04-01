@@ -54,6 +54,10 @@
   text-align: left;
 }
 
+.navItem svg {
+  color: var(--foreground-muted);
+}
+
 .navItem:hover {
   background: var(--surface-tertiary);
   color: var(--foreground-primary);
@@ -63,6 +67,10 @@
   background: var(--accent-primary-muted);
   color: var(--foreground-primary);
   font-weight: 500;
+}
+
+.active svg {
+  color: var(--accent-primary);
 }
 
 

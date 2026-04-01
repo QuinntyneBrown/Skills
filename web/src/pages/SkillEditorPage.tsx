@@ -166,11 +166,6 @@ export default function SkillEditorPage() {
     showToast('success', 'Share settings updated');
   };
 
-  const visibilityBadgeClass = visibility === 'public'
-    ? styles.metaBadgeSuccess
-    : visibility === 'shared'
-      ? styles.metaBadgeWarning
-      : styles.metaBadge;
 
   if (loading) {
     return (
@@ -199,7 +194,7 @@ export default function SkillEditorPage() {
             </button>
             <span className={styles.breadcrumb}>
               <button className={styles.breadcrumbLink} onClick={() => navigate('/dashboard')}>My Skills</button>
-              {' > '}
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--foreground-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
               <span className={styles.breadcrumbCurrent}>{name || 'New Skill'}</span>
             </span>
             <span className={styles.topBarTitle}>{name || 'New Skill'}</span>
@@ -225,6 +220,7 @@ export default function SkillEditorPage() {
               <span>Share</span>
             </button>
             <button className={styles.saveBtn} onClick={handleSave} disabled={saving}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path d="M17 21v-7H7v7"/><path d="M7 3v4h7"/></svg>
               {saving ? 'Saving...' : 'Save'}
             </button>
           </div>
@@ -232,10 +228,25 @@ export default function SkillEditorPage() {
 
         {/* Metadata Bar */}
         <div className={styles.meta}>
-          <span className={styles.metaBadge}>markdown</span>
-          {!isNew && <span className={styles.metaBadgeAccent}>v{version}</span>}
-          <span className={visibilityBadgeClass}>{visibility}</span>
-          <span className={styles.metaBadge}>{content.length} chars</span>
+          <div className={styles.metaGroup}>
+            <span className={styles.metaLabel}>Name</span>
+            <span className={styles.metaValue}>{name || 'Untitled'}</span>
+          </div>
+          <div className={styles.metaSep} />
+          <div className={styles.metaGroup}>
+            <span className={styles.metaLabel}>Tags</span>
+            <div className={styles.metaTags}>
+              {tags.split(',').filter(Boolean).map((t) => (
+                <span key={t.trim()} className={styles.metaBadgeInfo}>{t.trim()}</span>
+              ))}
+              {!tags.trim() && <span className={styles.metaBadge}>none</span>}
+            </div>
+          </div>
+          <div className={styles.metaSep} />
+          <div className={styles.metaGroup}>
+            <span className={styles.metaLabel}>Visibility</span>
+            <span className={visibility === 'public' ? styles.metaBadgeSuccess : visibility === 'shared' ? styles.metaBadgeWarning : styles.metaBadge}>{visibility}</span>
+          </div>
         </div>
 
         {/* Form Section */}

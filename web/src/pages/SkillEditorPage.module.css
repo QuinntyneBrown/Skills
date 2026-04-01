@@ -18,7 +18,6 @@
   justify-content: space-between;
   height: 56px;
   padding: 0 24px;
-  background: var(--surface-secondary);
   border-bottom: 1px solid var(--border-subtle);
   flex-shrink: 0;
 }
@@ -31,7 +30,7 @@
 }
 
 .backBtn {
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   background: none;
@@ -47,7 +46,10 @@
 }
 
 .breadcrumb {
-  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
   color: var(--foreground-muted);
   white-space: nowrap;
   overflow: hidden;
@@ -59,7 +61,8 @@
   cursor: pointer;
   background: none;
   border: none;
-  font-size: 14px;
+  font-size: 13px;
+  font-family: var(--font-body);
   padding: 0;
 }
 
@@ -69,12 +72,13 @@
 
 .breadcrumbCurrent {
   color: var(--foreground-primary);
+  font-weight: 500;
 }
 
 .topBarRight {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   flex-shrink: 0;
 }
 
@@ -99,14 +103,15 @@
 .saveBtn {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
+  gap: 8px;
+  padding: 10px 20px;
   background: var(--accent-primary);
   color: var(--foreground-inverse);
   border: none;
   border-radius: var(--radius-md);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
+  font-family: var(--font-body);
   cursor: pointer;
   white-space: nowrap;
 }
@@ -132,6 +137,37 @@
   flex-wrap: wrap;
 }
 
+.metaGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.metaLabel {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--foreground-muted);
+  letter-spacing: 0.5px;
+}
+
+.metaValue {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--foreground-primary);
+}
+
+.metaSep {
+  width: 1px;
+  height: 32px;
+  background: var(--border-subtle);
+  flex-shrink: 0;
+}
+
+.metaTags {
+  display: flex;
+  gap: 6px;
+}
+
 .metaBadge {
   display: inline-flex;
   align-items: center;
@@ -146,6 +182,11 @@
 .metaBadgeAccent {
   background: var(--accent-primary-muted);
   color: var(--accent-primary);
+}
+
+.metaBadgeInfo {
+  background: var(--color-info-muted);
+  color: var(--color-info);
 }
 
 .metaBadgeSuccess {
@@ -445,6 +486,14 @@
 
 @media (max-width: 991px) {
   .sidebarDesktop {
+    display: none;
+  }
+
+  .backBtn {
+    display: flex;
+  }
+
+  .breadcrumb {
     display: none;
   }
 
