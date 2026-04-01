@@ -11,7 +11,7 @@
     "migrate:rollback": "ts-node src/migrations/runner.ts rollback"
   },
   "dependencies": {
-    "argon2": "^0.41.1",
+    "@node-rs/argon2": "^2.0.2",
     "cors": "^2.8.5",
     "express": "^4.21.0",
     "helmet": "^8.0.0",

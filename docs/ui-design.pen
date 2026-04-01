@@ -9577,7 +9577,7 @@
               "ref": "YvKoA",
               "name": "err401Btn",
               "width": "fit_content",
-              "x": 138.33333333333334,
+              "x": 138.33333333333331,
               "y": 503.5,
               "descendants": {
                 "iTTYY": {
@@ -10735,6 +10735,287 @@
                       "x": 20
                     }
                   }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "y6VU4",
+          "type": "ref",
+          "ref": "4RHib",
+          "name": "deleteDialog",
+          "x": 560,
+          "y": 40
+        },
+        {
+          "type": "frame",
+          "id": "uEzPT",
+          "name": "Skeleton Loader",
+          "width": "fill_container",
+          "height": "fill_container",
+          "fill": "$surface-card",
+          "cornerRadius": "$radius-xl",
+          "stroke": {
+            "align": "inside",
+            "thickness": 1,
+            "fill": "$border-subtle"
+          },
+          "layout": "vertical",
+          "gap": 20,
+          "padding": 24,
+          "children": [
+            {
+              "type": "text",
+              "id": "YONlw",
+              "name": "skelTitle",
+              "fill": "$foreground-primary",
+              "content": "Dashboard — Loading State",
+              "fontFamily": "Geist",
+              "fontSize": 16,
+              "fontWeight": "600"
+            },
+            {
+              "type": "frame",
+              "id": "gR1bi",
+              "name": "skelHeader",
+              "width": "fill_container",
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "ZR8MY",
+                  "name": "skelHeaderBlock",
+                  "opacity": 0.6,
+                  "width": 180,
+                  "height": 28,
+                  "fill": "$surface-tertiary",
+                  "cornerRadius": "$radius-md"
+                },
+                {
+                  "type": "frame",
+                  "id": "PfF0f",
+                  "name": "skelHeaderBtn",
+                  "opacity": 0.4,
+                  "width": 100,
+                  "height": 36,
+                  "fill": "$surface-tertiary",
+                  "cornerRadius": "$radius-md"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "cGHEb",
+              "name": "skelSearch",
+              "opacity": 0.3,
+              "width": "fill_container",
+              "height": 40,
+              "fill": "$surface-tertiary",
+              "cornerRadius": "$radius-md"
+            },
+            {
+              "type": "frame",
+              "id": "bJaLl",
+              "name": "skelStats",
+              "width": "fill_container",
+              "gap": 12,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "0gmuo",
+                  "name": "skelStat1",
+                  "opacity": 0.3,
+                  "width": "fill_container",
+                  "height": 80,
+                  "fill": "$surface-tertiary",
+                  "cornerRadius": "$radius-lg"
+                },
+                {
+                  "type": "frame",
+                  "id": "dJTUO",
+                  "name": "skelStat2",
+                  "opacity": 0.3,
+                  "width": "fill_container",
+                  "height": 80,
+                  "fill": "$surface-tertiary",
+                  "cornerRadius": "$radius-lg"
+                },
+                {
+                  "type": "frame",
+                  "id": "rDK5w",
+                  "name": "skelStat3",
+                  "opacity": 0.3,
+                  "width": "fill_container",
+                  "height": 80,
+                  "fill": "$surface-tertiary",
+                  "cornerRadius": "$radius-lg"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "fQIKs",
+              "name": "skelTable",
+              "width": "fill_container",
+              "fill": "$surface-secondary",
+              "cornerRadius": "$radius-lg",
+              "stroke": {
+                "align": "inside",
+                "thickness": 1,
+                "fill": "$border-subtle"
+              },
+              "layout": "vertical",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "vinYt",
+                  "name": "skelRow1",
+                  "width": "fill_container",
+                  "height": 52,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": {
+                      "bottom": 1
+                    },
+                    "fill": "$border-subtle"
+                  },
+                  "gap": 16,
+                  "padding": [
+                    0,
+                    16
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "0HAxa",
+                      "name": "skelR1a",
+                      "opacity": 0.5,
+                      "width": "fill_container",
+                      "height": 14,
+                      "fill": "$surface-tertiary",
+                      "cornerRadius": "$radius-sm"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "8lx6K",
+                      "name": "skelR1b",
+                      "opacity": 0.3,
+                      "width": 80,
+                      "height": 14,
+                      "fill": "$surface-tertiary",
+                      "cornerRadius": "$radius-sm"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "JDIUI",
+                      "name": "skelR1c",
+                      "opacity": 0.3,
+                      "width": 60,
+                      "height": 14,
+                      "fill": "$surface-tertiary",
+                      "cornerRadius": "$radius-sm"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "7FIPT",
+                  "name": "skelRow2",
+                  "width": "fill_container",
+                  "height": 52,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": {
+                      "bottom": 1
+                    },
+                    "fill": "$border-subtle"
+                  },
+                  "gap": 16,
+                  "padding": [
+                    0,
+                    16
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "1ut0w",
+                      "name": "skelR2a",
+                      "opacity": 0.4,
+                      "width": "fill_container",
+                      "height": 14,
+                      "fill": "$surface-tertiary",
+                      "cornerRadius": "$radius-sm"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "xx8Om",
+                      "name": "skelR2b",
+                      "opacity": 0.25,
+                      "width": 80,
+                      "height": 14,
+                      "fill": "$surface-tertiary",
+                      "cornerRadius": "$radius-sm"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "K4SmO",
+                      "name": "skelR2c",
+                      "opacity": 0.25,
+                      "width": 60,
+                      "height": 14,
+                      "fill": "$surface-tertiary",
+                      "cornerRadius": "$radius-sm"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "I12Nd",
+                  "name": "skelRow3",
+                  "width": "fill_container",
+                  "height": 52,
+                  "gap": 16,
+                  "padding": [
+                    0,
+                    16
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "rFUxz",
+                      "name": "skelR3a",
+                      "opacity": 0.3,
+                      "width": "fill_container",
+                      "height": 14,
+                      "fill": "$surface-tertiary",
+                      "cornerRadius": "$radius-sm"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "3k9Qo",
+                      "name": "skelR3b",
+                      "opacity": 0.2,
+                      "width": 80,
+                      "height": 14,
+                      "fill": "$surface-tertiary",
+                      "cornerRadius": "$radius-sm"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "IVwcx",
+                      "name": "skelR3c",
+                      "opacity": 0.2,
+                      "width": 60,
+                      "height": 14,
+                      "fill": "$surface-tertiary",
+                      "cornerRadius": "$radius-sm"
+                    }
+                  ]
                 }
               ]
             }
