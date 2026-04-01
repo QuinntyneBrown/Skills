@@ -1,0 +1,34 @@
+@startuml c4_context
+!theme plain
+
+title System Context Diagram - Claude Skills API
+
+skinparam rectangle {
+    BackgroundColor<<Person>> #08427B
+    FontColor<<Person>> #FFFFFF
+    BackgroundColor<<System>> #1168BD
+    FontColor<<System>> #FFFFFF
+    BackgroundColor<<ExternalSystem>> #999999
+    FontColor<<ExternalSystem>> #FFFFFF
+}
+
+rectangle "SPA Frontend" <<Person>> as spa
+rectangle "CLI Client" <<Person>> as cli
+rectangle "Third-Party Client" <<Person>> as thirdparty
+
+rectangle "Claude Skills API\n[Software System]\n\nRESTful API serving skill\nmanagement operations with\nlayered security controls" <<System>> as api
+
+rectangle "PostgreSQL\n[Database]\n\nStores skills, users,\nAPI keys, audit logs" <<ExternalSystem>> as postgres
+rectangle "Redis\n[Cache/Store]\n\nRate limit counters,\nCSRF tokens, cache" <<ExternalSystem>> as redis
+rectangle "CDN / WAF\n[Infrastructure]\n\nTLS termination,\nDDoS protection" <<ExternalSystem>> as cdn
+
+spa -down-> cdn : "HTTPS requests\n+ CSRF token"
+cli -down-> cdn : "HTTPS requests\n+ API key / JWT"
+thirdparty -down-> cdn : "HTTPS requests\n+ API key"
+
+cdn -down-> api : "Proxied requests"
+
+api -down-> postgres : "SQL over TLS\n(parameterized queries)"
+api -down-> redis : "Rate limit checks,\nCSRF validation,\ncache reads"
+
+@enduml

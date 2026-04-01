@@ -1,0 +1,28 @@
+@startuml c4_container
+!theme plain
+
+title Container Diagram - Skills Management System
+
+skinparam rectangle {
+    BackgroundColor<<person>> #08427B
+    FontColor<<person>> #FFFFFF
+    BackgroundColor<<container>> #1168BD
+    FontColor<<container>> #FFFFFF
+    BackgroundColor<<database>> #2D882D
+    FontColor<<database>> #FFFFFF
+}
+
+rectangle "Authenticated User" <<person>> as user
+
+rectangle "Single-Page\nApplication\n[Angular / React]" <<container>> as spa
+rectangle "API Server\n[Node.js / .NET]\nRESTful API at /api/v1/" <<container>> as api
+rectangle "PostgreSQL 16\n[Database]\nSkills, versions, configs" <<database>> as db
+rectangle "Redis 7\n[Cache]\nRead-through skill cache" <<database>> as redis
+
+user -down-> spa : "Uses\n[HTTPS]"
+user -down-> api : "Direct API calls\n[HTTPS]"
+spa -down-> api : "Makes API calls\n[HTTPS / JSON]"
+api -down-> db : "Reads/writes skill data\n[TCP / SQL]"
+api -down-> redis : "Caches hot skill data\n[TCP / RESP]"
+
+@enduml

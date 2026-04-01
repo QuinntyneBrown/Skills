@@ -1,0 +1,33 @@
+@startuml c4_container
+!theme plain
+
+title C4 Container Diagram - Skills CLI
+
+skinparam rectangle {
+    BackgroundColor<<person>> #08427B
+    FontColor<<person>> #FFFFFF
+    BackgroundColor<<container>> #438DD5
+    FontColor<<container>> #FFFFFF
+    BackgroundColor<<external>> #999999
+    FontColor<<external>> #FFFFFF
+    BackgroundColor<<store>> #438DD5
+    FontColor<<store>> #FFFFFF
+}
+
+rectangle "User\n(Terminal / CI Runner)" <<person>> as User
+
+rectangle "Skills CLI System" {
+    rectangle "skills Binary\n[Container: Go]\nParses commands, manages auth,\nformats output, launches editor" <<container>> as Binary
+    rectangle "Credential Store\n[Container: OS Keychain / File]\nPersists OAuth access and\nrefresh tokens securely" <<store>> as CredStore
+}
+
+rectangle "Skills API Server\n[Container: HTTP/JSON]\nBackend for all skill\nand auth operations" <<external>> as API
+rectangle "System Browser\n[External]\nOAuth authorization flow" <<external>> as Browser
+
+User -down-> Binary : "Executes CLI commands"
+Binary -down-> API : "HTTPS requests\nBearer token auth"
+Binary -right-> CredStore : "Read / write\nOAuth tokens"
+Binary -left-> Browser : "Opens authorization URL\n(login flow only)"
+Browser -down-> API : "OAuth callback"
+
+@enduml

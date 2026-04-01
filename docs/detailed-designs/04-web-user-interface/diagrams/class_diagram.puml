@@ -1,0 +1,78 @@
+@startuml class_diagram
+!theme plain
+
+title Client-Side State Models
+
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontSize 11
+skinparam classBackgroundColor #F5F5F5
+skinparam classBorderColor #333333
+
+class AuthState {
+  isAuthenticated : boolean
+  user : User | null
+  accessToken : string | null
+  isRefreshing : boolean
+}
+
+class User {
+  id : string
+  email : string
+  displayName : string
+  role : "admin" | "member" | "viewer"
+}
+
+class SkillSummary {
+  id : string
+  name : string
+  description : string
+  tags : string[]
+  visibility : "private" | "shared" | "public"
+  updatedAt : string
+  authorName : string
+}
+
+class EditorState {
+  skillId : string | null
+  name : string
+  description : string
+  body : string
+  tags : string[]
+  etag : string | null
+  isDirty : boolean
+  isSaving : boolean
+  lastSavedAt : string | null
+  cursorPosition : {line, column}
+  lineCount : number
+  characterCount : number
+}
+
+class FilterState {
+  query : string
+  tags : string[]
+  visibility : string
+  createdAfter : string | null
+  createdBefore : string | null
+  sortField : string
+  sortOrder : "asc" | "desc"
+  page : number
+  pageSize : number
+}
+
+class OfflineQueueEntry {
+  id : string
+  skillId : string | null
+  operation : "CREATE" | "UPDATE"
+  payload : Record<string, unknown>
+  timestamp : string
+  status : "PENDING" | "SYNCING" | "FAILED"
+  retryCount : number
+  lastError : string | null
+}
+
+AuthState --> User : contains
+EditorState ..> SkillSummary : edits a skill
+FilterState ..> SkillSummary : filters list of
+OfflineQueueEntry ..> EditorState : queues save from
+
+@enduml

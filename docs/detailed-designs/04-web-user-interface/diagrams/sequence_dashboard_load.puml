@@ -1,0 +1,41 @@
+@startuml sequence_dashboard_load
+!theme plain
+
+title Dashboard Load - Auth Check and Skill List Fetch
+
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontSize 11
+skinparam sequenceMessageAlign center
+
+actor User as user
+participant "Browser" as browser
+participant "CDN" as cdn
+participant "AuthProvider" as auth
+participant "SkillDashboard" as dashboard
+participant "API Server" as api
+
+user -> browser : Navigate to app
+browser -> cdn : GET /index.html + bundles
+cdn --> browser : HTML shell + JS assets
+
+browser -> auth : App mounts, AuthProvider initializes
+auth -> api : POST /api/v1/auth/refresh\n(httpOnly cookie sent)
+
+alt Token refresh succeeds
+  api --> auth : 200 { accessToken }
+  auth -> auth : Store token in memory
+
+  browser -> dashboard : Render SkillDashboard
+  dashboard -> dashboard : Render skeleton loader cards
+  dashboard -> api : GET /api/v1/skills?page=1&page_size=25\n(Bearer token)
+  api --> dashboard : 200 { data: [...], pagination: {...} }
+  dashboard -> dashboard : Replace skeletons\nwith skill cards
+  dashboard --> user : Dashboard displayed
+
+else Token refresh fails
+  api --> auth : 401 Unauthorized
+  auth -> browser : Redirect to /login
+  browser --> user : Login page displayed
+end
+
+@enduml

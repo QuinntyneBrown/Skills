@@ -1,0 +1,26 @@
+@startuml c4_container
+!theme plain
+!include <C4/C4_Container>
+
+title Container Diagram - Claude Skills Observability & Resilience
+
+Person(user, "User", "Developer using SPA or CLI")
+
+System_Boundary(skills, "Claude Skills System") {
+    Container(lb, "Load Balancer", "Nginx / ALB", "Distributes traffic across stateless API instances.")
+    Container(api, "API Server", "Node.js / TypeScript", "Stateless REST API. Emits structured logs, metrics, and audit entries.")
+    ContainerDb(db, "PostgreSQL", "PostgreSQL 15+", "Stores skills, users, audit logs. Connection pooling configured.")
+    ContainerDb(redis, "Redis", "Redis 7+", "Cache-aside for skills. Rate limiting. Circuit breaker state.")
+}
+
+System_Ext(prometheus, "Prometheus + Grafana", "Metrics scraping and visualization")
+System_Ext(logAggregator, "Log Aggregator", "ELK / Loki for centralized log storage and search")
+
+Rel(user, lb, "HTTPS requests", "HTTPS")
+Rel(lb, api, "Forwards requests", "HTTP")
+Rel(api, db, "Reads/writes via connection pool", "TCP/5432")
+Rel(api, redis, "Cache get/set, rate limits", "TCP/6379")
+Rel(api, logAggregator, "Ships JSON logs", "TCP/HTTP")
+Rel(prometheus, api, "Scrapes /metrics", "HTTP/9090")
+
+@enduml

@@ -1,0 +1,35 @@
+@startuml c4_component
+!theme plain
+
+title C4 Component Diagram - Skills CLI Binary
+
+skinparam rectangle {
+    BackgroundColor<<component>> #85BBF0
+    FontColor<<component>> #000000
+    BackgroundColor<<external>> #999999
+    FontColor<<external>> #FFFFFF
+}
+
+rectangle "skills Binary" {
+    rectangle "CommandRouter\n[Component]\nParses argv, validates flags,\ndispatches to subcommand handlers" <<component>> as Router
+    rectangle "AuthManager\n[Component]\nLogin/logout, token storage,\nrefresh, env var override" <<component>> as Auth
+    rectangle "ApiClient\n[Component]\nHTTP client with auth headers,\nauto-refresh, retry logic" <<component>> as Client
+    rectangle "OutputFormatter\n[Component]\nRenders table, JSON,\nor quiet (ID-only) output" <<component>> as Formatter
+    rectangle "EditorLauncher\n[Component]\nOpens $EDITOR with temp file,\ndetects changes on close" <<component>> as Editor
+    rectangle "ConfigManager\n[Component]\nReads/writes config.json,\nresolves setting precedence" <<component>> as Config
+}
+
+rectangle "Skills API Server" <<external>> as API
+rectangle "Credential Store" <<external>> as CredStore
+
+Router -down-> Auth : "Check auth\nbefore dispatch"
+Router -down-> Client : "Pass to\nsubcommand handler"
+Router -down-> Formatter : "Format\ncommand result"
+Router -right-> Editor : "Delegate\nskills edit"
+Router -left-> Config : "Load\nuser preferences"
+
+Auth -down-> CredStore : "Store / retrieve\ntokens"
+Client -down-> API : "HTTPS\nrequests"
+Client -left-> Auth : "Get token,\nrequest refresh"
+
+@enduml

@@ -1,0 +1,22 @@
+@startuml c4_container
+!theme plain
+!include <C4/C4_Container>
+
+title Container Diagram - Skill Versioning
+
+Person(user, "User", "Developer using SPA or CLI")
+
+System_Boundary(skills, "Claude Skills System") {
+    Container(spa, "SPA", "TypeScript, React", "Dark-mode single-page application. Renders version history, side-by-side diffs, and restore UI.")
+    Container(api, "API Server", "Node.js / TypeScript", "Stateless REST API at /api/v1/. Handles version CRUD, diff computation, and restore.")
+    ContainerDb(db, "PostgreSQL", "PostgreSQL 15+", "Stores skills, skill_versions, users, and audit_logs tables.")
+    ContainerDb(redis, "Redis", "Redis 7+", "Caches version metadata and recent diff results.")
+}
+
+Rel(user, spa, "Uses", "HTTPS")
+Rel(user, api, "CLI requests", "HTTPS")
+Rel(spa, api, "API calls", "HTTPS/JSON")
+Rel(api, db, "Reads/writes versions", "TCP/5432")
+Rel(api, redis, "Caches metadata", "TCP/6379")
+
+@enduml

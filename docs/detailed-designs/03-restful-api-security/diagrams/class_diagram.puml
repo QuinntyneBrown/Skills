@@ -1,0 +1,72 @@
+@startuml class_diagram
+!theme plain
+
+title Class Diagram - API Security Domain Model
+
+class RateLimitEntry {
+    +key : string
+    +windowMs : number
+    +limit : number
+    +currentCount : number
+    +resetAt : number
+    --
+    +isExceeded() : boolean
+    +remaining() : number
+    +retryAfterSeconds() : number
+}
+note right of RateLimitEntry
+  Stored in Redis as a sorted set.
+  Key format: "ratelimit:user:{id}"
+  or "ratelimit:ip:{addr}"
+end note
+
+class ApiKey {
+    +id : uuid
+    +userId : uuid
+    +name : string
+    +keyPrefix : string
+    +keyHash : string
+    +scopes : string[]
+    +expiresAt : datetime?
+    +lastUsedAt : datetime?
+    +createdAt : datetime
+    +revokedAt : datetime?
+    --
+    +isActive() : boolean
+    +hasScope(scope: string) : boolean
+    +revoke() : void
+}
+
+class ErrorResponse {
+    +code : string
+    +message : string
+    +details : ErrorDetail[]
+    +correlationId : string
+    --
+    +toJSON() : object
+}
+
+class ErrorDetail {
+    +field : string?
+    +reason : string
+}
+
+class ValidationResult {
+    +isValid : boolean
+    +errors : ValidationError[]
+    +sanitizedBody : object
+    --
+    +addError(field, reason) : void
+    +merge(other: ValidationResult) : void
+}
+
+class ValidationError {
+    +field : string
+    +reason : string
+    +value : any?
+}
+
+ErrorResponse "1" *-- "0..*" ErrorDetail
+ValidationResult "1" *-- "0..*" ValidationError
+
+@enduml

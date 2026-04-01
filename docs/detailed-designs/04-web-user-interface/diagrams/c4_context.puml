@@ -1,0 +1,21 @@
+@startuml c4_context
+!theme plain
+
+title C4 Context Diagram - Claude Skills Web UI
+
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontSize 12
+
+actor "User" as user <<Person>>
+note right of user
+  Skill author or viewer
+  using a web browser
+end note
+
+rectangle "Claude Skills SPA" as spa <<Software System>> #4A90D9
+rectangle "API Server" as api <<Software System>> #50C878
+
+user --> spa : Browses, authors,\nand manages skills
+spa --> api : REST API calls\nover HTTPS\n(JSON + JWT)
+
+@enduml

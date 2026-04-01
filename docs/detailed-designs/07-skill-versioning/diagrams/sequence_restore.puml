@@ -1,0 +1,40 @@
+@startuml sequence_restore
+!theme plain
+
+title Restore Previous Version
+
+actor User
+participant "VersionController" as VC
+participant "VersionService" as VS
+participant "VersionRepository" as VR
+participant "SkillService" as SS
+participant "AuditService" as AS
+database "PostgreSQL" as DB
+
+User -> VC: POST /api/v1/skills/{id}/versions/{v}/restore
+VC -> VC: Validate user has write access
+
+VC -> VS: restoreVersion(skillId, v, user)
+VS -> VR: findBySkillIdAndVersion(skillId, v)
+VR -> DB: SELECT * FROM skill_versions\nWHERE skill_id = {id}\nAND version_number = {v}
+DB --> VR: targetVersion
+
+alt Version not found
+    VR --> VS: null
+    VS --> VC: VersionNotFoundError
+    VC --> User: 404 VERSION_NOT_FOUND
+else Version found
+    VR --> VS: targetVersion
+    VS -> SS: update(skillId, {\n  name, description, body,\n  tags, config\n}, currentVersion)
+    note right: Standard update flow:\noptimistic lock check,\nskill row update,\nnew version created (N+1)
+    SS --> VS: updatedSkill (version N+1)
+
+    VS -> AS: log({\n  action: "skill.version.restored",\n  skillId, fromVersion: v,\n  toVersion: N+1, userId\n})
+    AS -> DB: INSERT INTO audit_logs
+    DB --> AS: OK
+
+    VS --> VC: updatedSkill + restoredFromVersion
+    VC --> User: 200 OK\n{...skill, version: N+1,\nrestoredFromVersion: v}
+end
+
+@enduml

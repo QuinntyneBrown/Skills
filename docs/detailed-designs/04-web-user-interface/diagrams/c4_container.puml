@@ -1,0 +1,38 @@
+@startuml c4_container
+!theme plain
+
+title C4 Container Diagram - Claude Skills Web UI
+
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontSize 12
+
+actor "User" as user <<Person>>
+
+rectangle "CDN" as cdn <<Container>> #FFB347 {
+}
+note right of cdn
+  Serves static assets:
+  HTML shell, JS bundles,
+  CSS, fonts
+end note
+
+rectangle "Browser" as browser <<Container>> #4A90D9 {
+  rectangle "React SPA" as spa <<Application>>
+  rectangle "Monaco Editor" as monaco <<Library>>
+  rectangle "IndexedDB" as idb <<Storage>>
+}
+
+rectangle "API Server" as api <<Container>> #50C878
+note right of api
+  Node.js / Express
+  REST API at /api/v1/
+  JWT authentication
+end note
+
+user --> browser : Interacts via browser
+browser --> cdn : Loads static assets\n(initial page load)
+spa --> api : REST API calls\n(HTTPS + Bearer token)
+spa --> monaco : Editor integration
+spa --> idb : Offline queue\npersistence
+
+@enduml

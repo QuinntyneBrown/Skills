@@ -1,0 +1,56 @@
+@startuml sequence_login
+!theme plain
+
+title Login Flow with Token Issuance
+
+actor User as user
+participant "SPA" as spa
+participant "AuthController" as ctrl
+participant "AuthService" as auth
+participant "TokenService" as token
+database "Redis" as redis
+database "PostgreSQL" as db
+
+user -> spa : Submit email & password
+spa -> ctrl : POST /api/v1/auth/login\n{ email, password }
+ctrl -> auth : login(email, password)
+
+auth -> db : SELECT * FROM users\nWHERE email = ?
+db --> auth : user (or null)
+
+alt User not found
+    auth -> auth : Compare password against\ndummy hash (timing protection)
+    auth --> ctrl : 401 INVALID_CREDENTIALS
+else User found
+    auth -> redis : GET lockout:{userId}
+    redis --> auth : { attempts, firstAttemptAt }
+
+    alt 5+ attempts within 10 min
+        auth --> ctrl : 429 ACCOUNT_LOCKED\n(retryAfter: 900)
+    else Not locked
+        auth -> auth : Verify password (Argon2id)
+
+        alt Password invalid
+            auth -> redis : INCR lockout:{userId}\n(10-min TTL)
+            auth --> ctrl : 401 INVALID_CREDENTIALS
+        else Password valid
+            auth -> redis : DEL lockout:{userId}
+            auth -> auth : Check email_verified
+
+            alt Not verified
+                auth --> ctrl : 403 EMAIL_NOT_VERIFIED
+            else Verified
+                auth -> token : issueTokens(userId, roles)
+                token -> db : INSERT INTO refresh_tokens
+                token -> redis : SET rt:{hash} (7-day TTL)
+                token --> auth : { accessToken, refreshToken }
+                auth --> ctrl : 200 OK
+                ctrl --> spa : { accessToken, refreshToken,\nexpiresIn: 900 }
+            end
+        end
+    end
+end
+
+spa --> user : Redirect to dashboard
+
+@enduml

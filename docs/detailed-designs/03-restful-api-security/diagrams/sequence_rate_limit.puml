@@ -1,0 +1,36 @@
+@startuml sequence_rate_limit
+!theme plain
+
+title Rate Limit Check - Redis Sliding Window
+
+participant "RateLimit\nMiddleware" as RL
+database "Redis" as Redis
+participant "Next\nMiddleware" as Next
+
+RL -> RL : Determine key:\nuser:{id} or ip:{addr}
+RL -> RL : Determine limit:\n100 (auth) or 20 (unauth)
+
+RL -> Redis : MULTI (pipeline)
+RL -> Redis : ZREMRANGEBYSCORE key 0 (now - 60000)\n(evict expired entries)
+RL -> Redis : ZCARD key\n(count current window)
+RL -> Redis : ZADD key now now\n(record this request)
+RL -> Redis : EXPIRE key 60\n(reset TTL)
+RL -> Redis : EXEC
+Redis --> RL : [removed, count, added, ok]
+
+alt count < limit
+    RL -> RL : Set headers:\nX-RateLimit-Limit: {limit}\nX-RateLimit-Remaining: {limit - count - 1}\nX-RateLimit-Reset: {window_end_epoch}
+    RL -> Next : next()
+else count >= limit
+    RL -> Redis : ZREM key now\n(undo the ZADD)
+    Redis --> RL : ok
+    RL -> RL : Calculate retry_after\n= window_end - now (seconds)
+    RL --> RL : Return 429 Too Many Requests\nRetry-After: {retry_after}\nX-RateLimit-Limit: {limit}\nX-RateLimit-Remaining: 0\nX-RateLimit-Reset: {window_end_epoch}
+end
+
+alt Redis unavailable
+    RL -> RL : Log warning:\n"Rate limiter degraded"
+    RL -> Next : next()\n(fail open)
+end
+
+@enduml

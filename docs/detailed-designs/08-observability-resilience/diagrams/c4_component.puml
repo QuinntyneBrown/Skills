@@ -1,0 +1,30 @@
+@startuml c4_component
+!theme plain
+!include <C4/C4_Component>
+
+title Component Diagram - API Server Observability & Resilience
+
+Container_Boundary(api, "API Server") {
+    Component(correlationMw, "CorrelationIdMiddleware", "Middleware", "Assigns or propagates correlation ID on every request.")
+    Component(loggingMw, "LoggingMiddleware", "Middleware", "Emits structured JSON log entries per request/response.")
+    Component(errorHandler, "ErrorHandler", "Middleware", "Catches errors, returns standardized API responses with correlation ID.")
+    Component(metricsCollector, "MetricsCollector", "Service", "Records Prometheus counters, histograms, and gauges.")
+    Component(auditService, "AuditService", "Service", "Creates immutable audit log entries for mutations.")
+    Component(healthCheck, "HealthCheckService", "Service", "Probes PostgreSQL and Redis, reports aggregate status.")
+    Component(cacheService, "CacheService", "Service", "Cache-aside reads and invalidation for skills.")
+}
+
+ContainerDb(db, "PostgreSQL", "PostgreSQL 15+", "Audit logs, skills, users")
+ContainerDb(redis, "Redis", "Redis 7+", "Skill cache, rate limits")
+System_Ext(prometheus, "Prometheus", "Scrapes metrics")
+
+Rel(correlationMw, loggingMw, "Provides correlation_id")
+Rel(loggingMw, metricsCollector, "Reports request duration")
+Rel(errorHandler, loggingMw, "Logs errors with correlation_id")
+Rel(auditService, db, "Inserts audit entries")
+Rel(healthCheck, db, "SELECT 1 probe")
+Rel(healthCheck, redis, "PING probe")
+Rel(cacheService, redis, "GET/SET/DEL")
+Rel(prometheus, metricsCollector, "Scrapes /metrics")
+
+@enduml

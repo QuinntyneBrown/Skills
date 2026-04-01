@@ -1,0 +1,59 @@
+@startuml sequence_delete
+!theme plain
+
+title Soft Delete Skill Sequence
+
+actor Client
+participant "Authorization\nMiddleware" as Auth
+participant "Skill\nController" as Ctrl
+participant "Skill\nService" as Svc
+participant "Skill\nRepository" as Repo
+database "PostgreSQL" as DB
+participant "Cache\nService" as Cache
+
+Client -> Auth : DELETE /api/v1/skills/{id}\n+ JWT
+Auth -> Auth : Validate JWT,\nextract user & role
+Auth -> Ctrl : Authenticated request
+
+Ctrl -> Svc : deleteSkill(id, user)
+
+Svc -> Repo : findById(id)
+Repo -> DB : SELECT * FROM skills\nWHERE id=$1\nAND deleted_at IS NULL
+Repo --> Svc : skill
+
+alt Skill not found
+    Svc --> Ctrl : NotFoundError
+    Ctrl --> Client : 404 NOT_FOUND
+end
+
+Svc -> Svc : Check authorization:\nuser is owner or admin
+
+alt Not authorized
+    Svc --> Ctrl : ForbiddenError
+    Ctrl --> Client : 403 FORBIDDEN
+end
+
+Svc -> Repo : softDelete(id)
+Repo -> DB : UPDATE skills\nSET deleted_at = NOW()\nWHERE id=$1\nAND deleted_at IS NULL
+Repo --> Svc : success
+
+Svc -> Cache : invalidate("skill:{id}")
+Svc -> Cache : invalidate("skill:list:*")
+
+Svc --> Ctrl : void
+Ctrl --> Client : 204 No Content
+
+== Admin Restore Flow ==
+
+Client -> Auth : POST /api/v1/skills/{id}/restore\n+ JWT (admin)
+Auth -> Ctrl : Authenticated request (admin)
+Ctrl -> Svc : restoreSkill(id, user)
+Svc -> Svc : Verify admin role
+Svc -> Repo : restore(id)
+Repo -> DB : UPDATE skills\nSET deleted_at = NULL\nWHERE id=$1\nAND deleted_at IS NOT NULL
+Repo --> Svc : restored skill
+Svc -> Cache : invalidate("skill:list:*")
+Svc --> Ctrl : skill
+Ctrl --> Client : 200 OK + restored skill JSON
+
+@enduml

@@ -1,0 +1,31 @@
+@startuml c4_context
+!theme plain
+
+title C4 Context — Search & Filtering
+
+skinparam rectangle {
+  BackgroundColor<<Person>> #08427B
+  FontColor<<Person>> #FFFFFF
+  BackgroundColor<<System>> #1168BD
+  FontColor<<System>> #FFFFFF
+  BackgroundColor<<ExternalSystem>> #999999
+  FontColor<<ExternalSystem>> #FFFFFF
+}
+
+rectangle "User" <<Person>> as user {
+}
+
+rectangle "Skills Management\nSystem" <<System>> as skills {
+}
+
+rectangle "PostgreSQL\n[Full-Text Search]" <<ExternalSystem>> as pg {
+}
+
+rectangle "Redis\n[Query Cache]" <<ExternalSystem>> as redis {
+}
+
+user --> skills : "Searches and filters skills\nvia Web UI or CLI"
+skills --> pg : "Executes FTS queries\nand filter SQL"
+skills --> redis : "Caches search results\n(read-through, 60s TTL)"
+
+@enduml

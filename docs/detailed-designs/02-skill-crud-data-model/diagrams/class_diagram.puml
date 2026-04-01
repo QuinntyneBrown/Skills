@@ -1,0 +1,66 @@
+@startuml class_diagram
+!theme plain
+
+title Data Model - Skill CRUD Entities
+
+class Skill {
+    +id : UUID <<PK>>
+    +owner_id : UUID <<FK -> users>>
+    +name : VARCHAR(200)
+    +description : VARCHAR(2000)
+    +body : TEXT
+    +visibility : VARCHAR(10)
+    +tags : TEXT[]
+    +version : INTEGER
+    +created_at : TIMESTAMPTZ
+    +updated_at : TIMESTAMPTZ
+    +deleted_at : TIMESTAMPTZ
+    +created_by : UUID <<FK -> users>>
+    --
+    <<UNIQUE>> (owner_id, name) WHERE deleted_at IS NULL
+    <<CHECK>> char_length(body) <= 500000
+    <<CHECK>> visibility IN ('private','shared','public')
+    <<GIN INDEX>> idx_skills_tags ON tags
+    <<INDEX>> idx_skills_owner_id ON owner_id
+    <<INDEX>> idx_skills_updated_at ON updated_at DESC
+}
+
+class SkillVersion {
+    +id : UUID <<PK>>
+    +skill_id : UUID <<FK -> skills>>
+    +version : INTEGER
+    +name : VARCHAR(200)
+    +description : VARCHAR(2000)
+    +body : TEXT
+    +tags : TEXT[]
+    +changed_by : UUID <<FK -> users>>
+    +created_at : TIMESTAMPTZ
+    --
+    <<INDEX>> idx_skill_versions_skill_id ON (skill_id, version DESC)
+}
+
+class SkillConfig {
+    +id : UUID <<PK>>
+    +skill_id : UUID <<FK -> skills>>
+    +key : VARCHAR(100)
+    +value : TEXT
+    +created_at : TIMESTAMPTZ
+    +updated_at : TIMESTAMPTZ
+    --
+    <<UNIQUE>> (skill_id, key)
+}
+
+class User {
+    +id : UUID <<PK>>
+    +email : VARCHAR(255)
+    +role : VARCHAR(20)
+    --
+    (Defined in Feature 01)
+}
+
+Skill "1" -- "0..*" SkillVersion : "has versions >"
+Skill "1" -- "0..*" SkillConfig : "has configs >"
+User "1" -- "0..*" Skill : "owns >"
+User "1" -- "0..*" SkillVersion : "changes >"
+
+@enduml

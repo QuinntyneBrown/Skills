@@ -1,0 +1,39 @@
+@startuml sequence_create
+!theme plain
+
+title Create Skill from File
+
+actor User
+participant "CommandRouter" as Router
+participant "AuthManager" as Auth
+participant "ApiClient" as Client
+participant "OutputFormatter" as Formatter
+participant "Skills API\n/api/v1/skills" as API
+entity "Local File\n(--body-file)" as File
+
+User -> Router : skills create --name "My Skill"\n--body-file ./skill.md --tags "go,cli"
+Router -> Router : Parse and validate flags
+
+Router -> File : Read file contents
+File --> Router : file body text
+
+Router -> Client : POST /api/v1/skills\n{name, body, tags}
+Client -> Auth : getToken()
+Auth --> Client : Bearer token
+
+Client -> API : POST /api/v1/skills\nAuthorization: Bearer <token>
+API --> Client : 201 Created\n{data: {id, name, ...}}
+
+Client --> Router : CommandResult(data=SkillOutput)
+
+Router -> Formatter : render(result)
+
+alt --quiet mode
+    Formatter --> User : "abc-123" (ID only, stdout)
+else --json mode
+    Formatter --> User : {"id":"abc-123","name":"My Skill",...} (stdout)
+else table mode (default)
+    Formatter --> User : "Created skill abc-123: My Skill" (stdout)
+end
+
+@enduml

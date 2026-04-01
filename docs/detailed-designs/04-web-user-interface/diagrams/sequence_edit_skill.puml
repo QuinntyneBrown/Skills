@@ -1,0 +1,50 @@
+@startuml sequence_edit_skill
+!theme plain
+
+title Edit Skill - Load, Edit, Save with Optimistic Concurrency
+
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontSize 11
+skinparam sequenceMessageAlign center
+
+actor User as user
+participant "SkillEditor" as editor
+participant "Monaco Editor" as monaco
+participant "HTTP Client" as http
+participant "API Server" as api
+
+user -> editor : Navigate to /skills/:id/edit
+editor -> http : GET /api/v1/skills/:id
+http -> api : GET /api/v1/skills/:id\n(Bearer token)
+api --> http : 200 { skill } + ETag: "v3"
+http --> editor : Skill data + etag
+
+editor -> monaco : Initialize with skill.body
+editor -> editor : Set etag = "v3"\nShow status bar
+
+user -> monaco : Edit content
+monaco -> editor : onChange: update body,\nisDirty = true
+editor -> editor : Update line count,\ncursor position,\ncharacter count
+
+user -> editor : Ctrl+S (save)
+editor -> http : PUT /api/v1/skills/:id\n{ name, body, tags }\nIf-Match: "v3"
+http -> api : PUT /api/v1/skills/:id
+
+alt Save succeeds
+  api --> http : 200 { skill } + ETag: "v4"
+  http --> editor : Updated skill + new etag
+  editor -> editor : etag = "v4"\nisDirty = false\nShow "Saved"
+
+else Conflict detected
+  api --> http : 409 Conflict
+  http --> editor : Conflict error
+  editor -> user : Show conflict dialog:\n"Server version changed.\nOverwrite / Merge / Discard?"
+
+  user -> editor : Choose resolution
+  editor -> http : PUT /api/v1/skills/:id\n(force or merged content)
+  http -> api : PUT with resolved content
+  api --> http : 200 { skill } + ETag: "v5"
+  http --> editor : Resolved
+end
+
+@enduml

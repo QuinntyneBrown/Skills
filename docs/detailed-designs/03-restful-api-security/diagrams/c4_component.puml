@@ -1,0 +1,36 @@
+@startuml c4_component
+!theme plain
+
+title Component Diagram - API Server Middleware Stack
+
+skinparam rectangle {
+    BackgroundColor<<Middleware>> #1168BD
+    FontColor<<Middleware>> #FFFFFF
+    BackgroundColor<<Handler>> #2D882D
+    FontColor<<Handler>> #FFFFFF
+    BackgroundColor<<Service>> #5A5A5A
+    FontColor<<Service>> #FFFFFF
+}
+
+package "API Server" {
+    rectangle "CorsMiddleware\n\nValidates Origin against\nCORS allowlist" <<Middleware>> as cors
+    rectangle "SecurityHeadersMiddleware\n\nInjects HSTS, CSP,\nX-Frame-Options, etc." <<Middleware>> as headers
+    rectangle "RateLimitMiddleware\n\nSliding window check\nvia Redis sorted sets" <<Middleware>> as ratelimit
+    rectangle "CsrfMiddleware\n\nValidates CSRF token\nfor browser mutations" <<Middleware>> as csrf
+    rectangle "AuthMiddleware\n\nJWT / API key validation\nPopulates user context" <<Middleware>> as auth
+    rectangle "ValidationMiddleware\n\nSchema check, sanitize,\nstrip unknown fields" <<Middleware>> as validation
+    rectangle "Controller\n\nBusiness logic handler\nfor the matched route" <<Handler>> as controller
+    rectangle "ErrorHandler\n\nCatches exceptions,\nformats error envelope" <<Handler>> as errorhandler
+    rectangle "OpenApiGenerator\n\nGenerates OpenAPI 3.x\nspec from route metadata" <<Service>> as openapi
+}
+
+cors -down-> headers : "next()"
+headers -down-> ratelimit : "next()"
+ratelimit -down-> csrf : "next()"
+csrf -down-> auth : "next()"
+auth -down-> validation : "next()"
+validation -down-> controller : "next()"
+controller .right.> errorhandler : "on exception"
+openapi .left.> controller : "reads route\nmetadata"
+
+@enduml

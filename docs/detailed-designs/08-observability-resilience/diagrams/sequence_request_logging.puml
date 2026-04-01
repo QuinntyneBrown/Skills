@@ -1,0 +1,38 @@
+@startuml sequence_request_logging
+!theme plain
+
+title Request Logging Pipeline
+
+actor Client
+participant "CorrelationId\nMiddleware" as CorrMw
+participant "Logging\nMiddleware" as LogMw
+participant "Metrics\nCollector" as Metrics
+participant "Route\nHandler" as Handler
+participant "Log\nAggregator" as Logs
+
+Client -> CorrMw: HTTP Request
+note right of CorrMw
+  Check X-Correlation-ID header.
+  If absent, generate UUIDv4.
+end note
+CorrMw -> CorrMw: Attach correlation_id\nto request context
+
+CorrMw -> LogMw: Forward request
+LogMw -> LogMw: Record start time,\nextract method, path, user_id
+LogMw -> Metrics: Increment http_requests_total
+
+LogMw -> Handler: Forward request
+Handler --> LogMw: Response (status_code)
+
+LogMw -> LogMw: Compute duration_ms
+LogMw -> Metrics: Observe http_request_duration_seconds
+LogMw -> Logs: Emit structured JSON log entry
+note right of Logs
+  { timestamp, severity, correlation_id,
+    method, path, status_code,
+    duration_ms, user_id }
+end note
+
+LogMw --> Client: Response with\nX-Correlation-ID header
+
+@enduml

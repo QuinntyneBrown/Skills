@@ -1,0 +1,23 @@
+@startuml c4_context
+!theme plain
+!include <C4/C4_Context>
+
+title System Context - Claude Skills Observability & Resilience
+
+Person(user, "User", "Developer using the Claude Skills SPA or CLI.")
+Person(ops, "Operations", "SRE / DevOps monitoring system health.")
+
+System(skillsSystem, "Claude Skills System", "Web application for managing Claude skills. Stateless API with structured logging, metrics, and audit trails.")
+
+System_Ext(prometheus, "Prometheus + Grafana", "Scrapes metrics from the API and provides dashboards and alerting.")
+System_Ext(logAggregator, "Log Aggregator", "Centralized logging (ELK/Loki). Receives structured JSON logs.")
+System_Ext(alerting, "Alerting System", "Sends alerts via PagerDuty, Slack, or email when thresholds are breached.")
+
+Rel(user, skillsSystem, "Uses skills API", "HTTPS")
+Rel(ops, prometheus, "Views dashboards and alerts", "HTTPS")
+Rel(ops, logAggregator, "Searches logs", "HTTPS")
+Rel(skillsSystem, logAggregator, "Ships structured JSON logs", "TCP/HTTP")
+Rel(prometheus, skillsSystem, "Scrapes /metrics", "HTTP")
+Rel(prometheus, alerting, "Fires alerts on threshold breach", "HTTP")
+
+@enduml

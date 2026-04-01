@@ -1,0 +1,53 @@
+@startuml class_diagram
+!theme plain
+
+title Data Model - Observability & Resilience
+
+class AuditLogEntry {
+  +id: UUID
+  +action: String
+  +resource_type: String
+  +resource_id: UUID
+  +user_id: UUID
+  +correlation_id: UUID
+  +before: JSONB
+  +after: JSONB
+  +metadata: JSONB
+  +timestamp: Timestamptz
+}
+note right of AuditLogEntry
+  Append-only table.
+  No UPDATE or DELETE.
+  Partitioned by month.
+end note
+
+class HealthStatus {
+  +status: "healthy" | "degraded" | "unhealthy"
+  +timestamp: String
+  +dependencies: DependencyStatus[]
+}
+
+class DependencyStatus {
+  +name: String
+  +status: "up" | "down" | "degraded"
+  +latency_ms: Number
+  +message: String?
+}
+
+class CacheEntry<T> {
+  +key: String
+  +value: T
+  +ttl_seconds: Number
+  +created_at: String
+}
+
+class MetricDefinition {
+  +name: String
+  +type: "counter" | "histogram" | "gauge"
+  +help: String
+  +labels: String[]
+}
+
+HealthStatus "1" *-- "1..*" DependencyStatus
+
+@enduml

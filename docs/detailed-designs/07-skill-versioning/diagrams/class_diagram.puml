@@ -1,0 +1,68 @@
+@startuml class_diagram
+!theme plain
+
+title Class Diagram - Skill Versioning Data Model
+
+class Skill {
+    +id: UUID <<PK>>
+    +name: VARCHAR(255)
+    +description: TEXT
+    +body: TEXT
+    +tags: JSONB
+    +config: JSONB
+    +owner_id: UUID <<FK>>
+    +version: INTEGER
+    +created_at: TIMESTAMPTZ
+    +updated_at: TIMESTAMPTZ
+}
+note right of Skill::version
+  Used for optimistic
+  concurrency (Feature 02).
+  Incremented on every update.
+end note
+
+class SkillVersion {
+    +id: UUID <<PK>>
+    +skill_id: UUID <<FK>>
+    +version_number: INTEGER
+    +name: VARCHAR(255)
+    +description: TEXT
+    +body: TEXT
+    +tags: JSONB
+    +config: JSONB
+    +created_by: UUID <<FK>>
+    +created_at: TIMESTAMPTZ
+}
+note right of SkillVersion
+  UNIQUE(skill_id, version_number)
+  Full snapshot of skill state
+  at time of each update.
+end note
+
+class DiffResult {
+    +skillId: UUID
+    +fromVersion: INTEGER
+    +toVersion: INTEGER
+    +fromCreatedAt: TIMESTAMPTZ
+    +toCreatedAt: TIMESTAMPTZ
+    +diffs: Map<String, FieldDiff>
+    +stats: DiffStats
+}
+
+class DiffLine {
+    +type: "added" | "removed" | "unchanged"
+    +lineNumber: INTEGER
+    +content: STRING
+}
+
+class DiffStats {
+    +additions: INTEGER
+    +deletions: INTEGER
+    +totalChangedLines: INTEGER
+}
+
+Skill "1" -- "0..*" SkillVersion : has versions >
+DiffResult "1" *-- "0..*" DiffLine : contains >
+DiffResult "1" *-- "1" DiffStats : contains >
+
+@enduml

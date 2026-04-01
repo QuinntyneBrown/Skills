@@ -1,0 +1,68 @@
+@startuml sequence_filter
+!theme plain
+
+title Combined Filter + Sort + Paginate Flow
+
+actor "Client" as client
+participant "SearchController" as ctrl
+participant "SearchService" as svc
+participant "SearchCache" as cache
+participant "QueryParser" as parser
+participant "FilterBuilder" as filter
+database "PostgreSQL" as pg
+
+client -> ctrl : GET /api/v1/skills?q=terraform\n&tags=devops,cloud\n&created_after=2026-01-01\n&sort=name&order=asc\n&page=1&page_size=20
+activate ctrl
+
+ctrl -> ctrl : Parse and validate all\nquery parameters into\nFilterCriteria
+ctrl -> svc : search(criteria)
+activate svc
+
+svc -> svc : Compute cache key
+svc -> cache : get(cacheKey)
+activate cache
+cache --> svc : null (miss)
+deactivate cache
+
+svc -> parser : parse("terraform")
+activate parser
+parser --> svc : plainto_tsquery('english',\n'terraform')
+deactivate parser
+
+svc -> filter : build(criteria)
+activate filter
+
+filter -> filter : Add FTS predicate:\nsearch_vector @@ $1
+
+filter -> filter : Add tag filter:\ntags @> ARRAY['devops',\n'cloud']::text[]
+
+filter -> filter : Add date filter:\ncreated_at >= '2026-01-01'
+
+filter -> filter : Add RBAC predicates:\n(visibility = 'public'\nOR author_id = $n\nOR role = 'admin')
+
+filter -> filter : Set ORDER BY: name ASC\n(explicit sort overrides\ndefault relevance)
+
+filter -> filter : Set LIMIT 20 OFFSET 0
+
+filter --> svc : Complete query\n+ parameter array
+deactivate filter
+
+svc -> pg : Execute parameterized query
+activate pg
+pg -> pg : GIN index scan\n(search_vector + tags)
+pg -> pg : B-tree filter\n(created_at range)
+pg -> pg : Sort by name ASC
+pg --> svc : Result rows\n+ total count
+deactivate pg
+
+svc -> svc : Map rows to\nSearchResultItems\n(include highlights\nfrom ts_headline)
+
+svc -> cache : set(cacheKey, result,\nTTL=60s)
+
+svc --> ctrl : SearchResult
+deactivate svc
+
+ctrl --> client : 200 OK\n{\n  data: [...],\n  pagination: {\n    page: 1,\n    pageSize: 20,\n    total: 47,\n    totalPages: 3\n  }\n}
+deactivate ctrl
+
+@enduml

@@ -1,0 +1,46 @@
+@startuml sequence_edit
+!theme plain
+
+title Edit Skill in $EDITOR
+
+actor User
+participant "CommandRouter" as Router
+participant "ApiClient" as Client
+participant "EditorLauncher" as Editor
+participant "Skills API\n/api/v1/skills" as API
+entity "Temp File\n/tmp/skills-edit-*" as TempFile
+
+User -> Router : skills edit abc-123
+Router -> Client : GET /api/v1/skills/abc-123
+Client -> API : GET /api/v1/skills/abc-123
+API --> Client : 200 {data: {id, name, body, ...}}
+Client --> Router : SkillOutput
+
+Router -> Editor : launchEdit(skillBody)
+Editor -> TempFile : Write body (perms 0600)
+Editor -> Editor : Record file mtime
+
+Editor -> User : Open $EDITOR with temp file
+User -> User : Edit content in editor
+User -> Editor : Save and close editor
+
+Editor -> TempFile : Read new mtime
+Editor -> Editor : Compare mtime values
+
+alt File was modified
+    Editor -> TempFile : Read updated content
+    Editor --> Router : newBody
+
+    Router -> Client : PATCH /api/v1/skills/abc-123\n{body: newBody}
+    Client -> API : PATCH /api/v1/skills/abc-123
+    API --> Client : 200 {data: {id, name, body, ...}}
+    Client --> Router : CommandResult(success)
+    Router --> User : "Updated skill abc-123"
+else File was not modified
+    Editor --> Router : nil (no changes)
+    Router --> User : "No changes detected"
+end
+
+Editor -> TempFile : Delete temp file
+
+@enduml

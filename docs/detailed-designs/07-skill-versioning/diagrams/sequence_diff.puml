@@ -1,0 +1,36 @@
+@startuml sequence_diff
+!theme plain
+
+title Diff Computation Between Two Versions
+
+actor User
+participant "VersionController" as VC
+participant "VersionService" as VS
+participant "VersionRepository" as VR
+participant "DiffEngine" as DE
+database "PostgreSQL" as DB
+
+User -> VC: GET /api/v1/skills/{id}/versions/{v1}/diff/{v2}
+VC -> VC: Validate user has read access
+
+VC -> VS: diffVersions(skillId, v1, v2)
+VS -> VR: findBySkillIdAndVersions(skillId, v1, v2)
+VR -> DB: SELECT * FROM skill_versions\nWHERE skill_id = {id}\nAND version_number IN (v1, v2)
+DB --> VR: [versionA, versionB]
+
+alt Either version not found
+    VR --> VS: null
+    VS --> VC: VersionNotFoundError
+    VC --> User: 404 VERSION_NOT_FOUND
+else Both versions found
+    VR --> VS: [versionA, versionB]
+    VS -> DE: compute(versionA, versionB)
+    DE -> DE: Split body into lines
+    DE -> DE: Run Myers diff algorithm
+    DE -> DE: Build DiffResult with\nDiffLine[] and DiffStats
+    DE --> VS: DiffResult
+    VS --> VC: DiffResult
+    VC --> User: 200 OK\n{diffs, stats}
+end
+
+@enduml

@@ -1,0 +1,31 @@
+@startuml c4_context
+!theme plain
+
+title System Context Diagram - Skills Management System
+
+skinparam rectangle {
+    BackgroundColor<<person>> #08427B
+    FontColor<<person>> #FFFFFF
+    BackgroundColor<<system>> #1168BD
+    FontColor<<system>> #FFFFFF
+    BackgroundColor<<external>> #999999
+    FontColor<<external>> #FFFFFF
+}
+
+rectangle "Authenticated User" <<person>> as user {
+}
+
+rectangle "Skills Management\nSystem" <<system>> as skills {
+}
+
+rectangle "PostgreSQL\nDatabase" <<external>> as db {
+}
+
+rectangle "Identity Provider\n(OAuth / JWT)" <<external>> as idp {
+}
+
+user -down-> skills : "Creates, reads, updates,\nand deletes skills via\nWeb UI, CLI, or API"
+skills -down-> db : "Persists skill data,\nversions, and configs"
+skills -right-> idp : "Validates JWT tokens,\nresolves user identity"
+
+@enduml

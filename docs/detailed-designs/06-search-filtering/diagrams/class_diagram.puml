@@ -1,0 +1,86 @@
+@startuml class_diagram
+!theme plain
+
+title Class Diagram — Search & Filtering Data Model
+
+class FilterCriteria {
+  +query : string?
+  +tags : string[]?
+  +author : string?
+  +status : string?
+  +createdAfter : string?
+  +createdBefore : string?
+  +sort : SortField
+  +order : SortOrder
+  +page : number
+  +pageSize : number
+}
+
+class SearchResult {
+  +items : SearchResultItem[]
+  +total : number
+  +page : number
+  +pageSize : number
+  +totalPages : number
+  +query : string?
+}
+
+class SearchResultItem {
+  +id : string
+  +name : string
+  +description : string
+  +author : AuthorSummary
+  +tags : string[]
+  +status : string
+  +createdAt : string
+  +updatedAt : string
+  +relevanceScore : number?
+  +highlights : HighlightSnippet[]?
+}
+
+class HighlightSnippet {
+  +field : HighlightField
+  +fragment : string
+}
+
+class AuthorSummary {
+  +id : string
+  +username : string
+}
+
+class SearchIndex {
+  +skillId : string
+  +searchVector : tsvector
+  --
+  Stored generated column on skills table.
+  Weighted: name(A), description(B), body(C).
+  GIN-indexed for fast @@ queries.
+}
+
+enum SortField {
+  name
+  created_at
+  updated_at
+  relevance
+}
+
+enum SortOrder {
+  asc
+  desc
+}
+
+enum HighlightField {
+  name
+  description
+  body
+}
+
+SearchResult *-- "0..*" SearchResultItem
+SearchResultItem *-- "0..*" HighlightSnippet
+SearchResultItem *-- "1" AuthorSummary
+FilterCriteria --> SortField
+FilterCriteria --> SortOrder
+HighlightSnippet --> HighlightField
+SearchIndex .. SearchResultItem : "FTS query produces"
+
+@enduml

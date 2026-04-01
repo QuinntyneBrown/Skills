@@ -1,0 +1,65 @@
+@startuml sequence_offline_sync
+!theme plain
+
+title Offline Editing - Detect, Queue, and Sync
+
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontSize 11
+skinparam sequenceMessageAlign center
+
+actor User as user
+participant "SkillEditor" as editor
+participant "OfflineQueue" as queue
+participant "IndexedDB" as idb
+participant "API Server" as api
+
+== Online Editing ==
+user -> editor : Editing skill content
+
+== Network Loss Detected ==
+editor -> queue : window 'offline' event
+queue -> editor : Show banner:\n"You are offline"
+
+== Offline Save ==
+user -> editor : Ctrl+S (save)
+editor -> queue : Save requested (offline)
+queue -> idb : Store OfflineQueueEntry\n{ id, skillId, operation: UPDATE,\npayload, status: PENDING }
+idb --> queue : Stored
+queue -> editor : Show "Saved offline"
+editor --> user : Status bar: "Saved offline"
+
+user -> editor : Continue editing...
+user -> editor : Ctrl+S again
+editor -> queue : Save requested (offline)
+queue -> idb : Store another entry\n(PENDING)
+
+== Network Restored ==
+queue -> queue : window 'online' event
+queue -> editor : Show "Syncing..."
+
+loop For each PENDING entry (FIFO)
+  queue -> idb : Get next PENDING entry
+  idb --> queue : OfflineQueueEntry
+  queue -> idb : Update status: SYNCING
+  queue -> api : PUT /api/v1/skills/:id\n(Bearer token + If-Match)
+
+  alt Sync succeeds
+    api --> queue : 200 OK + new ETag
+    queue -> idb : Delete entry
+    queue -> editor : Update etag
+
+  else Conflict (409)
+    api --> queue : 409 Conflict
+    queue -> idb : Update status: FAILED
+    queue -> user : Prompt conflict resolution
+
+  else Transient failure
+    api --> queue : 5xx / Network error
+    queue -> queue : Exponential backoff\n(max 3 retries)
+  end
+end
+
+queue -> editor : Hide banner
+editor --> user : "All changes synced"
+
+@enduml

@@ -1,0 +1,16 @@
+@startuml c4_context
+!theme plain
+!include <C4/C4_Context>
+
+title System Context - Skill Versioning
+
+Person(user, "User", "A developer who manages Claude skills and views their revision history.")
+
+System(skillsSystem, "Claude Skills System", "Web application for managing Claude skills. Tracks full version history for every skill.")
+
+SystemDb(db, "PostgreSQL Database", "Stores skills, version history, users, and audit logs.")
+
+Rel(user, skillsSystem, "Manages skills, views history, compares versions, restores", "HTTPS")
+Rel(skillsSystem, db, "Reads/writes skill versions", "TCP/5432")
+
+@enduml

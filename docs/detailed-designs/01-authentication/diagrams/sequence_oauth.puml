@@ -1,0 +1,55 @@
+@startuml sequence_oauth
+!theme plain
+
+title OAuth Login Flow (GitHub / Google)
+
+actor User as user
+participant "SPA" as spa
+participant "AuthController" as ctrl
+participant "AuthService" as auth
+participant "TokenService" as token
+database "Redis" as redis
+database "PostgreSQL" as db
+participant "OAuth Provider" as provider
+
+user -> spa : Click "Login with GitHub"
+spa -> ctrl : POST /api/v1/auth/oauth/github
+ctrl -> auth : initiateOAuth("github")
+auth -> redis : SET oauth_state:{state} (5-min TTL)
+auth --> ctrl : { authorizationUrl }
+ctrl --> spa : 200 { authorizationUrl }
+spa -> user : Redirect to provider
+
+user -> provider : Authorize application
+provider -> ctrl : GET /api/v1/auth/oauth/github/callback\n?code={code}&state={state}
+
+ctrl -> auth : handleOAuthCallback("github", code, state)
+auth -> redis : GET oauth_state:{state}
+redis --> auth : valid
+
+auth -> provider : Exchange code for access token
+provider --> auth : { access_token }
+auth -> provider : Fetch user profile
+provider --> auth : { email, provider_user_id }
+
+auth -> db : SELECT * FROM oauth_accounts\nWHERE provider='github'\nAND provider_user_id=?
+
+alt Existing OAuth link
+    auth -> db : Load linked user
+else No link, but email exists
+    auth -> db : Link OAuth to existing user
+else No user at all
+    auth -> db : INSERT user (email_verified=true)\nINSERT oauth_account\nINSERT user_role (member)
+end
+
+auth -> token : issueTokens(userId, roles)
+token -> db : INSERT INTO refresh_tokens
+token -> redis : SET rt:{hash}
+token --> auth : { accessToken, refreshToken }
+
+auth --> ctrl : tokens
+ctrl -> spa : 302 Redirect to\n/oauth/callback#tokens
+
+spa --> user : Logged in
+
+@enduml

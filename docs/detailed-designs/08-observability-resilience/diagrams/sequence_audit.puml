@@ -1,0 +1,44 @@
+@startuml sequence_audit
+!theme plain
+
+title Audit Log Creation on Skill Mutation
+
+actor Client
+participant "Skill\nController" as Controller
+participant "Skill\nService" as Service
+participant "Skill\nRepository" as Repo
+database "PostgreSQL" as DB
+participant "Audit\nService" as Audit
+participant "Audit\nRepository" as AuditRepo
+
+Client -> Controller: PUT /api/v1/skills/{id}\n{ name: "New Name" }
+Controller -> Service: updateSkill(id, payload, userId)
+
+Service -> Repo: findById(id)
+Repo -> DB: SELECT * FROM skills\nWHERE id = $1
+DB --> Repo: Existing skill (before)
+Repo --> Service: before snapshot
+
+Service -> Repo: update(id, payload)
+Repo -> DB: UPDATE skills SET ...\nWHERE id = $1
+DB --> Repo: Updated skill (after)
+Repo --> Service: after snapshot
+
+Service -> Audit: log(action="update",\nresource_type="skill",\nresource_id=id,\nuser_id, before, after)
+
+Audit -> Audit: Enrich with correlation_id\nand timestamp
+Audit -> Audit: Scrub sensitive fields\nfrom before/after
+Audit -> AuditRepo: insert(auditLogEntry)
+AuditRepo -> DB: INSERT INTO audit_logs ...
+DB --> AuditRepo: OK
+
+note right of Audit
+  Fire-and-forget: if insert fails,
+  log ERROR but do not fail the
+  primary request.
+end note
+
+Service --> Controller: Updated skill
+Controller --> Client: 200 OK
+
+@enduml

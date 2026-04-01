@@ -1,0 +1,32 @@
+@startuml sequence_version_create
+!theme plain
+
+title Version Creation on Skill Update
+
+actor User
+participant "SkillController" as SC
+participant "SkillService" as SS
+participant "VersionService" as VS
+participant "VersionRepository" as VR
+database "PostgreSQL" as DB
+
+User -> SC: PUT /api/v1/skills/{id}\n{name, body, ..., version: N}
+SC -> SS: update(id, payload, version: N)
+
+SS -> DB: BEGIN TRANSACTION
+SS -> DB: SELECT version FROM skills\nWHERE id = {id} FOR UPDATE
+DB --> SS: version = N
+
+SS -> DB: UPDATE skills SET ...,\nversion = N+1\nWHERE id = {id} AND version = N
+DB --> SS: 1 row updated
+
+SS -> VS: createVersion(skill, user)
+VS -> VR: insert(skillVersion)
+VR -> DB: INSERT INTO skill_versions\n(skill_id, version_number, name,\nbody, tags, config, created_by)
+DB --> VR: OK
+
+SS -> DB: COMMIT
+SS --> SC: updatedSkill
+SC --> User: 200 OK\n{...skill, version: N+1}
+
+@enduml

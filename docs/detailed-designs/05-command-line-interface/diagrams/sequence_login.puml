@@ -1,0 +1,38 @@
+@startuml sequence_login
+!theme plain
+
+title First-Time Login - Browser OAuth Flow
+
+actor User
+participant "CommandRouter" as Router
+participant "AuthManager" as Auth
+participant "Local Callback\nServer" as Callback
+participant "System Browser" as Browser
+participant "Skills API\n/api/v1/auth" as API
+participant "Credential Store" as Store
+
+User -> Router : skills login
+Router -> Auth : initiateLogin()
+
+Auth -> Auth : Generate PKCE\ncode_verifier + code_challenge
+Auth -> Auth : Generate random state param
+Auth -> Callback : Start HTTP server\non 127.0.0.1:<random-port>
+Auth -> Browser : Open authorization URL\nwith redirect_uri, state, code_challenge
+
+Browser -> API : GET /authorize\n(user authenticates & consents)
+API -> Browser : Redirect to\n127.0.0.1:<port>/callback?code=XXX&state=YYY
+
+Browser -> Callback : GET /callback?code=XXX&state=YYY
+Callback -> Auth : Return authorization code
+
+Auth -> Auth : Validate state parameter
+Auth -> API : POST /api/v1/auth/token\n{code, code_verifier, redirect_uri}
+API --> Auth : {access_token, refresh_token, expires_in}
+
+Auth -> Store : Save StoredCredential
+Auth -> Callback : Shutdown server
+
+Auth --> Router : CommandResult(exit_code=0)
+Router --> User : "Login successful"
+
+@enduml

@@ -1,0 +1,62 @@
+@startuml c4_component
+!theme plain
+
+title C4 Component Diagram - SPA Internal Components
+
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontSize 12
+skinparam rectangleBorderColor #333333
+
+rectangle "React SPA" as spa {
+
+  rectangle "AppShell" as appshell <<Component>> #4A90D9
+  note bottom of appshell
+    Root layout frame:
+    sidebar, top bar,
+    content area
+  end note
+
+  rectangle "Router" as router <<Component>> #4A90D9
+
+  rectangle "AuthProvider" as auth <<Component>> #E8A838
+  note bottom of auth
+    JWT in memory,
+    refresh via cookie,
+    401/403 handling
+  end note
+
+  rectangle "SkillDashboard" as dashboard <<Component>> #50C878
+
+  rectangle "SkillEditor" as editor <<Component>> #50C878
+  note bottom of editor
+    Monaco wrapper,
+    Ctrl+S save,
+    status bar
+  end note
+
+  rectangle "SearchBar" as search <<Component>> #9B59B6
+
+  rectangle "ErrorBoundary" as errbound <<Component>> #E74C3C
+  note bottom of errbound
+    Catches render errors,
+    network failures,
+    offline detection
+  end note
+
+  rectangle "OfflineQueue" as offline <<Component>> #E74C3C
+}
+
+rectangle "API Server" as api <<External>> #888888
+
+appshell --> router : renders routes
+router --> dashboard : /dashboard
+router --> editor : /skills/:id/edit
+appshell --> errbound : wraps content
+dashboard --> search : search input
+auth --> api : token refresh
+dashboard --> api : GET /skills
+editor --> api : PUT /skills/:id
+editor --> offline : queues saves\nwhen offline
+offline --> api : syncs on\nreconnect
+
+@enduml

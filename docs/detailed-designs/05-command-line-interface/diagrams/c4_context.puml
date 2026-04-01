@@ -1,0 +1,27 @@
+@startuml c4_context
+!theme plain
+
+title C4 Context Diagram - Skills CLI
+
+skinparam rectangle {
+    BackgroundColor<<person>> #08427B
+    FontColor<<person>> #FFFFFF
+    BackgroundColor<<system>> #1168BD
+    FontColor<<system>> #FFFFFF
+    BackgroundColor<<external>> #999999
+    FontColor<<external>> #FFFFFF
+}
+
+rectangle "User\n(Terminal / CI Runner)" <<person>> as User
+rectangle "Skills CLI\n[Software System]\nCross-platform binary providing\nskill management from the terminal" <<system>> as CLI
+rectangle "Skills API Server\n[Software System]\nRESTful API serving all\nskill and auth operations" <<external>> as API
+rectangle "OS Keychain\n[External System]\nPlatform-native secure\ncredential storage" <<external>> as Keychain
+rectangle "System Browser\n[External System]\nCompletes OAuth\nauthorization flow" <<external>> as Browser
+
+User -down-> CLI : "Runs commands\n(skills create, list, edit, ...)"
+CLI -down-> API : "HTTPS /api/v1/*\nJSON requests"
+CLI -right-> Keychain : "Store / retrieve\nOAuth tokens"
+CLI -left-> Browser : "Opens OAuth\nauthorization URL"
+Browser -down-> API : "User authenticates\nand grants consent"
+
+@enduml

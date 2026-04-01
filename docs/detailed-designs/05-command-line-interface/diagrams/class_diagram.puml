@@ -1,0 +1,74 @@
+@startuml class_diagram
+!theme plain
+
+title Data Model - Skills CLI
+
+class CliConfig {
+    +api_url : string
+    +default_output : string
+    +editor : string
+    +page_size : int
+    --
+    +Load(path: string) : CliConfig
+    +Save(path: string) : error
+    +Resolve(flags, env) : CliConfig
+}
+
+class StoredCredential {
+    +access_token : string
+    +refresh_token : string
+    +token_type : string
+    +expires_at : int64
+    +issuer : string
+    --
+    +IsExpired() : bool
+    +ExpiresWithin(d: Duration) : bool
+}
+
+class CommandResult {
+    +exit_code : int
+    +data : interface{}
+    +error : string
+    +message : string
+    --
+    +IsSuccess() : bool
+}
+
+class SkillOutput {
+    +id : string
+    +name : string
+    +description : string
+    +body : string
+    +tags : []string
+    +author : string
+    +created_at : string
+    +updated_at : string
+    +version : int
+}
+
+class PaginationMeta {
+    +page : int
+    +page_size : int
+    +total : int
+    +total_pages : int
+}
+
+class ApiError {
+    +code : string
+    +message : string
+    +details : []FieldError
+    --
+    +ToExitCode() : int
+}
+
+class FieldError {
+    +field : string
+    +reason : string
+}
+
+CommandResult *-- SkillOutput : "data may contain"
+CommandResult *-- PaginationMeta : "data may contain"
+CommandResult *-- ApiError : "on failure"
+ApiError *-- FieldError : "details"
+
+@enduml

@@ -1,0 +1,55 @@
+@startuml sequence_list
+!theme plain
+
+title List Skills Sequence (Pagination + Authorization)
+
+actor Client
+participant "Authorization\nMiddleware" as Auth
+participant "Skill\nController" as Ctrl
+participant "Skill\nService" as Svc
+participant "Skill\nRepository" as Repo
+database "PostgreSQL" as DB
+participant "Cache\nService" as Cache
+
+Client -> Auth : GET /api/v1/skills\n?page=1&page_size=25\n&tags=productivity\n+ JWT
+Auth -> Auth : Validate JWT,\nextract user ID & role
+Auth -> Ctrl : Authenticated request
+
+Ctrl -> Ctrl : Parse query params:\npage, page_size, sort,\norder, tags
+Ctrl -> Svc : listSkills(query, user)
+
+Svc -> Svc : Build authorization filter\nbased on user role
+
+note right of Svc
+  Admin: no ownership filter
+  Member: owner_id = user OR
+    visibility = 'public' OR
+    shared with user
+  Viewer: visibility = 'public'
+    OR shared with user
+end note
+
+Svc -> Cache : get("skill:list:{hash}")
+
+alt Cache hit
+    Cache --> Svc : cached result
+    Svc --> Ctrl : result
+    Ctrl --> Client : 200 OK + cached response
+end
+
+Svc -> Repo : count(authFilter, tagFilter)
+Repo -> DB : SELECT COUNT(*)\nFROM skills\nWHERE deleted_at IS NULL\nAND <auth_filter>\nAND tags @> $tags
+Repo --> Svc : total_count
+
+Svc -> Repo : findAll(authFilter,\ntagFilter, page, pageSize)
+Repo -> DB : SELECT id, owner_id, name,\ndescription, tags, visibility,\nversion, created_at, updated_at\nFROM skills\nWHERE deleted_at IS NULL\nAND <auth_filter>\nAND tags @> $tags\nORDER BY updated_at DESC\nLIMIT $pageSize OFFSET $offset
+Repo --> Svc : skills[]
+
+Svc -> Svc : Compute pagination:\ntotal_pages = ceil(count / page_size)
+
+Svc -> Cache : set("skill:list:{hash}",\nresult, TTL=2min)
+
+Svc --> Ctrl : { data, pagination }
+Ctrl --> Client : 200 OK +\n{ data: [...], pagination: {...} }
+
+@enduml

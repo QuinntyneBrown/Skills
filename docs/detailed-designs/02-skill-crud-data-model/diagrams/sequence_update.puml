@@ -1,0 +1,58 @@
+@startuml sequence_update
+!theme plain
+
+title Update Skill Sequence (Optimistic Concurrency)
+
+actor Client
+participant "Authorization\nMiddleware" as Auth
+participant "Skill\nController" as Ctrl
+participant "Skill\nService" as Svc
+participant "Skill\nRepository" as Repo
+database "PostgreSQL" as DB
+participant "Cache\nService" as Cache
+
+Client -> Auth : PATCH /api/v1/skills/{id}\n+ JWT + body (includes version)
+Auth -> Auth : Validate JWT,\nextract user & role
+Auth -> Ctrl : Authenticated request
+
+Ctrl -> Ctrl : Parse request body,\nextract mutable fields
+Ctrl -> Svc : updateSkill(id, dto, user)
+
+Svc -> Repo : findById(id)
+Repo -> DB : SELECT * FROM skills\nWHERE id=$1\nAND deleted_at IS NULL
+Repo --> Svc : current skill
+
+alt Skill not found
+    Svc --> Ctrl : NotFoundError
+    Ctrl --> Client : 404 NOT_FOUND
+end
+
+Svc -> Svc : Check authorization:\nuser is owner or admin
+
+alt Not authorized
+    Svc --> Ctrl : ForbiddenError
+    Ctrl --> Client : 403 FORBIDDEN
+end
+
+Svc -> Svc : Validate updated fields
+
+Svc -> Repo : update(id, dto, expectedVersion)
+Repo -> DB : BEGIN TRANSACTION
+Repo -> DB : INSERT INTO skill_versions\n(snapshot current state)
+Repo -> DB : UPDATE skills SET ...,\nversion = version + 1\nWHERE id=$1\nAND version=$expectedVersion
+Repo -> DB : COMMIT
+
+alt 0 rows updated (version mismatch)
+    Repo --> Svc : OptimisticLockError
+    Svc --> Ctrl : ConflictError
+    Ctrl --> Client : 409 CONFLICT\n"Skill modified by another user"
+end
+
+Repo --> Svc : updated skill
+
+Svc -> Cache : invalidate("skill:{id}")
+Svc -> Cache : invalidate("skill:list:*")
+Svc --> Ctrl : skill
+Ctrl --> Client : 200 OK + updated skill JSON
+
+@enduml

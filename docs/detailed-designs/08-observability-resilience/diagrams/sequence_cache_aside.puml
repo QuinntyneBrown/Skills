@@ -1,0 +1,45 @@
+@startuml sequence_cache_aside
+!theme plain
+
+title Cache-Aside Read Pattern
+
+actor Client
+participant "Skill\nController" as Controller
+participant "Cache\nService" as Cache
+participant "Redis" as Redis
+participant "Skill\nRepository" as Repo
+database "PostgreSQL" as DB
+
+Client -> Controller: GET /api/v1/skills/{id}
+Controller -> Cache: get("skill:{id}")
+Cache -> Redis: GET skill:{id}
+
+alt Cache Hit
+    Redis --> Cache: Cached JSON
+    Cache --> Controller: Deserialized skill
+    Controller --> Client: 200 OK (from cache)
+
+else Cache Miss
+    Redis --> Cache: null
+    Cache -> Repo: findById(id)
+    Repo -> DB: SELECT * FROM skills\nWHERE id = $1
+    DB --> Repo: Row data
+    Repo --> Cache: Skill object
+
+    Cache -> Redis: SET skill:{id}\nEX 300 (5 min TTL)
+    Redis --> Cache: OK
+
+    Cache --> Controller: Skill object
+    Controller --> Client: 200 OK (from DB)
+
+else Redis Unavailable (circuit open)
+    Redis --> Cache: Error / timeout
+    Cache -> Repo: findById(id)
+    Repo -> DB: SELECT * FROM skills\nWHERE id = $1
+    DB --> Repo: Row data
+    Repo --> Cache: Skill object
+    Cache --> Controller: Skill object\n(skip cache write)
+    Controller --> Client: 200 OK (fallback)
+end
+
+@enduml

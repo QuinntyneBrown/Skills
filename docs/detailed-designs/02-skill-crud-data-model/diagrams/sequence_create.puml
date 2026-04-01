@@ -1,0 +1,45 @@
+@startuml sequence_create
+!theme plain
+
+title Create Skill Sequence
+
+actor Client
+participant "Authorization\nMiddleware" as Auth
+participant "Skill\nController" as Ctrl
+participant "Skill\nService" as Svc
+participant "Skill\nRepository" as Repo
+database "PostgreSQL" as DB
+participant "Cache\nService" as Cache
+
+Client -> Auth : POST /api/v1/skills\n+ JWT + body
+Auth -> Auth : Validate JWT,\nextract user & role
+Auth -> Ctrl : Authenticated request
+
+Ctrl -> Ctrl : Parse and schema-validate\nrequest body
+Ctrl -> Svc : createSkill(dto, user)
+
+Svc -> Svc : Validate fields:\nname (1-200 chars),\nbody (1-500K chars)
+
+alt Validation fails
+    Svc --> Ctrl : ValidationError
+    Ctrl --> Client : 400 VALIDATION_ERROR
+end
+
+Svc -> Repo : insert(skill)
+Repo -> DB : BEGIN TRANSACTION
+Repo -> DB : INSERT INTO skills (...)
+Repo -> DB : INSERT INTO skill_versions (version=1)
+Repo -> DB : COMMIT
+Repo --> Svc : created skill
+
+alt Unique constraint violation
+    Repo --> Svc : DuplicateError
+    Svc --> Ctrl : ConflictError
+    Ctrl --> Client : 409 CONFLICT
+end
+
+Svc -> Cache : invalidate("skill:list:*")
+Svc --> Ctrl : skill
+Ctrl --> Client : 201 Created + skill JSON
+
+@enduml

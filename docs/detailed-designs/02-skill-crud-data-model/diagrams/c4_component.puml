@@ -1,0 +1,29 @@
+@startuml c4_component
+!theme plain
+
+title Component Diagram - API Server (Skill CRUD)
+
+skinparam rectangle {
+    BackgroundColor<<component>> #1168BD
+    FontColor<<component>> #FFFFFF
+    BackgroundColor<<database>> #2D882D
+    FontColor<<database>> #FFFFFF
+}
+
+rectangle "Authorization\nMiddleware\nJWT validation, RBAC" <<component>> as auth
+rectangle "Skill\nController\nHTTP routing,\nrequest/response" <<component>> as ctrl
+rectangle "Skill\nService\nBusiness rules,\nvalidation, orchestration" <<component>> as svc
+rectangle "Skill\nRepository\nParameterized SQL,\ndatabase access" <<component>> as repo
+rectangle "Cache\nService\nRead-through cache,\ninvalidation" <<component>> as cache
+
+rectangle "PostgreSQL" <<database>> as db
+rectangle "Redis" <<database>> as redis
+
+auth -right-> ctrl : "Passes authenticated\nrequest context"
+ctrl -down-> svc : "Delegates\nbusiness operations"
+svc -down-> repo : "Executes\ndata operations"
+svc -right-> cache : "Checks cache,\ninvalidates on write"
+repo -down-> db : "Parameterized\nSQL queries"
+cache -down-> redis : "GET / SET / DEL\ncache entries"
+
+@enduml

@@ -1,0 +1,39 @@
+@startuml sequence_registration
+!theme plain
+
+title Registration Flow (Email/Password)
+
+actor User as user
+participant "SPA" as spa
+participant "AuthController" as ctrl
+participant "AuthService" as auth
+participant "UserRepository" as repo
+database "PostgreSQL" as db
+participant "EmailService" as email
+
+user -> spa : Fill registration form
+spa -> ctrl : POST /api/v1/auth/register\n{ email, password }
+ctrl -> auth : register(email, password)
+
+auth -> auth : Validate password complexity\n(12+ chars, upper, lower, digit, special)
+auth -> repo : findByEmail(email)
+repo -> db : SELECT * FROM users WHERE email = ?
+db --> repo : result (null or user)
+
+alt Email already exists
+    auth --> ctrl : Return generic success\n(prevent enumeration)
+    ctrl --> spa : 201 { message: "Check your email..." }
+else Email is new
+    auth -> auth : Hash password (Argon2id)
+    auth -> repo : createUser(email, hash, verificationToken)
+    repo -> db : INSERT INTO users (...)\nINSERT INTO user_roles (member)
+    db --> repo : OK
+    auth -> email : sendVerificationEmail(email, token)
+    email --> auth : OK
+    auth --> ctrl : success
+    ctrl --> spa : 201 { message: "Check your email..." }
+end
+
+spa --> user : "Check your email to verify your account."
+
+@enduml

@@ -1,0 +1,60 @@
+@startuml sequence_search
+!theme plain
+
+title Full-Text Search Flow (with Cache Check)
+
+actor "Client" as client
+participant "SearchController" as ctrl
+participant "SearchService" as svc
+participant "SearchCache" as cache
+participant "QueryParser" as parser
+participant "FilterBuilder" as filter
+database "PostgreSQL" as pg
+
+client -> ctrl : GET /api/v1/skills?q=...&page=1
+activate ctrl
+
+ctrl -> ctrl : Validate query parameters
+ctrl -> svc : search(criteria)
+activate svc
+
+svc -> svc : Compute cache key\n(hash of criteria + userId)
+svc -> cache : get(cacheKey)
+activate cache
+
+alt Cache Hit
+  cache --> svc : Cached SearchResult
+  svc --> ctrl : SearchResult
+  ctrl --> client : 200 OK (JSON)
+else Cache Miss
+  cache --> svc : null
+  deactivate cache
+
+  svc -> parser : parse("deployment automation")
+  activate parser
+  parser -> parser : Sanitize input\n(strip dangerous chars,\nenforce length limit)
+  parser --> svc : plainto_tsquery('english',\n'deployment automation')
+  deactivate parser
+
+  svc -> filter : build(criteria)
+  activate filter
+  filter -> filter : Append RBAC predicates\n(visibility + role check)
+  filter --> svc : WHERE clause + params
+  deactivate filter
+
+  svc -> pg : Execute FTS query\n(ts_rank + ts_headline\n+ LIMIT/OFFSET)
+  activate pg
+  pg --> svc : Rows + total count
+  deactivate pg
+
+  svc -> svc : Map rows to\nSearchResultItems\nwith highlights
+  svc -> cache : set(cacheKey, result, TTL=60s)
+
+  svc --> ctrl : SearchResult
+end
+
+deactivate svc
+ctrl --> client : 200 OK (JSON)
+deactivate ctrl
+
+@enduml

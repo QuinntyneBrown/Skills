@@ -1,0 +1,25 @@
+@startuml c4_component
+!theme plain
+!include <C4/C4_Component>
+
+title Component Diagram - Skill Versioning (API Server)
+
+Container_Boundary(api, "API Server") {
+    Component(controller, "VersionController", "TypeScript", "HTTP layer: receives version requests, validates input, delegates to services.")
+    Component(service, "VersionService", "TypeScript", "Orchestrates version creation, retrieval, diff, and restore workflows.")
+    Component(repository, "VersionRepository", "TypeScript", "Data access for the skill_versions table. Handles pagination and ordering.")
+    Component(diffEngine, "DiffEngine", "TypeScript", "Computes structured line-level diffs using the Myers algorithm.")
+    Component(skillService, "SkillService", "TypeScript", "Existing service from Feature 02. Called during restore to update the skill.")
+    Component(auditService, "AuditService", "TypeScript", "Existing service from Feature 08. Records restore actions in the audit log.")
+}
+
+ContainerDb(db, "PostgreSQL", "PostgreSQL 15+", "skill_versions, skills, audit_logs")
+
+Rel(controller, service, "Delegates to")
+Rel(service, repository, "Reads/writes versions")
+Rel(service, diffEngine, "Computes diffs")
+Rel(service, skillService, "Updates skill on restore")
+Rel(service, auditService, "Logs restore actions")
+Rel(repository, db, "SQL queries", "TCP/5432")
+
+@enduml

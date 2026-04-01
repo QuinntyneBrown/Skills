@@ -1,0 +1,35 @@
+@startuml c4_container
+!theme plain
+
+title C4 Container — Search & Filtering
+
+skinparam rectangle {
+  BackgroundColor<<Person>> #08427B
+  FontColor<<Person>> #FFFFFF
+  BackgroundColor<<Container>> #438DD5
+  FontColor<<Container>> #FFFFFF
+  BackgroundColor<<Database>> #438DD5
+  FontColor<<Database>> #FFFFFF
+}
+
+rectangle "User" <<Person>> as user
+
+rectangle "Web UI\n[Browser SPA]" <<Container>> as webui
+
+rectangle "CLI\n[Command-Line Tool]" <<Container>> as cli
+
+rectangle "API Server\n[Node.js / Express]" <<Container>> as api {
+}
+
+database "PostgreSQL\n[Skills Storage + FTS]" <<Database>> as pg
+
+database "Redis\n[Query Result Cache]" <<Database>> as redis
+
+user --> webui : "Enters search query\nand filters"
+user --> cli : "Runs search commands"
+webui --> api : "GET /api/v1/skills?q=...&tags=...\n[HTTPS / JSON]"
+cli --> api : "GET /api/v1/skills?q=...&tags=...\n[HTTPS / JSON]"
+api --> pg : "Executes parameterized\nFTS + filter SQL\n[TCP / libpq]"
+api --> redis : "Read-through cache\nGET/SET with TTL\n[TCP / Redis protocol]"
+
+@enduml

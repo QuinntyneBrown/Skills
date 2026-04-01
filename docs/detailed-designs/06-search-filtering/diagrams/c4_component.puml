@@ -1,0 +1,36 @@
+@startuml c4_component
+!theme plain
+
+title C4 Component — API Server (Search & Filtering)
+
+skinparam rectangle {
+  BackgroundColor<<Component>> #85BBF0
+  FontColor<<Component>> #000000
+  BackgroundColor<<Database>> #438DD5
+  FontColor<<Database>> #FFFFFF
+}
+
+rectangle "SearchController\n[REST Controller]\nAccepts HTTP requests,\nvalidates query params" <<Component>> as ctrl
+
+rectangle "SearchService\n[Service]\nOrchestrates cache, parsing,\nfiltering, and DB execution" <<Component>> as svc
+
+rectangle "QueryParser\n[Service]\nSanitizes and transforms\nraw input to tsquery" <<Component>> as parser
+
+rectangle "FilterBuilder\n[Service]\nConstructs parameterized\nSQL WHERE clauses" <<Component>> as filter
+
+rectangle "SearchIndexer\n[Service]\nMaintains tsvector column,\nprovides reindex capability" <<Component>> as indexer
+
+rectangle "SearchCache\n[Service]\nRedis read-through cache\nwith TTL and invalidation" <<Component>> as cache
+
+database "PostgreSQL" <<Database>> as pg
+database "Redis" <<Database>> as redis
+
+ctrl --> svc : "search(criteria)"
+svc --> cache : "get(cacheKey)"
+svc --> parser : "parse(rawQuery)"
+svc --> filter : "build(criteria)"
+svc --> pg : "Execute SQL"
+cache --> redis : "GET / SET"
+indexer --> pg : "Maintain search_vector\ncolumn and GIN index"
+
+@enduml

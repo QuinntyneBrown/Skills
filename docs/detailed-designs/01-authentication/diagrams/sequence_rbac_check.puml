@@ -1,0 +1,54 @@
+@startuml sequence_rbac_check
+!theme plain
+
+title RBAC Authorization Check on Skill Operation
+
+actor User as user
+participant "SPA" as spa
+participant "AuthMiddleware" as authMw
+participant "RbacMiddleware" as rbacMw
+participant "RoleService" as roleSvc
+participant "ShareService" as shareSvc
+participant "SkillController" as skillCtrl
+database "PostgreSQL" as db
+
+user -> spa : Edit a skill
+spa -> authMw : PUT /api/v1/skills/{id}\nAuthorization: Bearer {jwt}
+
+authMw -> authMw : Validate JWT signature\nand expiry
+authMw -> rbacMw : req.user = { id, roles }
+
+rbacMw -> roleSvc : authorize(userId, "skill:update", skillId)
+
+alt User has admin role
+    roleSvc --> rbacMw : ALLOW
+else Not admin
+    roleSvc -> db : SELECT owner_id FROM skills\nWHERE id = ?
+    db --> roleSvc : { owner_id }
+
+    alt userId == owner_id
+        roleSvc --> rbacMw : ALLOW
+    else Not owner
+        roleSvc -> shareSvc : getShare(skillId, userId)
+        shareSvc -> db : SELECT * FROM skill_shares\nWHERE skill_id = ? AND shared_with_user_id = ?
+        db --> shareSvc : share (or null)
+
+        alt Share exists with permission='write'
+            shareSvc --> roleSvc : { permission: "write" }
+            roleSvc --> rbacMw : ALLOW
+        else No write share
+            roleSvc --> rbacMw : DENY
+        end
+    end
+end
+
+alt ALLOW
+    rbacMw -> skillCtrl : Forward request
+    skillCtrl --> spa : 200 OK
+else DENY
+    rbacMw --> spa : 403 Forbidden
+end
+
+spa --> user : Show result
+
+@enduml

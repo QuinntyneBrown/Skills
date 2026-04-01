@@ -1,0 +1,39 @@
+@startuml c4_container
+!theme plain
+
+title Container Diagram - Claude Skills API
+
+skinparam rectangle {
+    BackgroundColor<<Container>> #1168BD
+    FontColor<<Container>> #FFFFFF
+    BackgroundColor<<Database>> #2D882D
+    FontColor<<Database>> #FFFFFF
+    BackgroundColor<<Infrastructure>> #999999
+    FontColor<<Infrastructure>> #FFFFFF
+    BackgroundColor<<Client>> #08427B
+    FontColor<<Client>> #FFFFFF
+}
+
+rectangle "SPA Frontend\n[React Application]\n\nBrowser-based UI" <<Client>> as spa
+rectangle "CLI Client\n[Node.js CLI]\n\nTerminal-based client" <<Client>> as cli
+
+rectangle "CDN / WAF\n[Cloudflare / AWS CloudFront]\n\nTLS termination, static assets,\nedge-level rate limiting" <<Infrastructure>> as cdn
+
+rectangle "Load Balancer\n[Nginx / ALB]\n\nRoutes traffic to\nAPI server instances" <<Infrastructure>> as lb
+
+rectangle "API Server\n[Node.js / Express]\n\nMiddleware pipeline,\ncontrollers, OpenAPI generator.\nStateless, horizontally scalable." <<Container>> as api
+
+rectangle "Redis\n[Redis 7.x]\n\nRate limit sorted sets,\nCSRF token store,\nresponse cache" <<Database>> as redis
+
+rectangle "PostgreSQL\n[PostgreSQL 16]\n\nSkills, users, API keys,\naudit logs, versions" <<Database>> as postgres
+
+spa -down-> cdn
+cli -down-> lb
+
+cdn -down-> lb : "HTTPS"
+lb -down-> api : "HTTP (private network)"
+
+api -right-> redis : "Rate limits,\nCSRF tokens,\ncache"
+api -down-> postgres : "Queries via\nconnection pool"
+
+@enduml

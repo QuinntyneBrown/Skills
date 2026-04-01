@@ -1,0 +1,45 @@
+@startuml sequence_request_pipeline
+!theme plain
+
+title Request Pipeline - Full Middleware Chain
+
+actor Client
+participant "CORS\nMiddleware" as CORS
+participant "Security\nHeaders" as Headers
+participant "Rate Limit\nMiddleware" as RateLimit
+participant "CSRF\nMiddleware" as CSRF
+participant "Auth\nMiddleware" as Auth
+participant "Validation\nMiddleware" as Validation
+participant "Controller" as Controller
+database "Redis" as Redis
+database "PostgreSQL" as DB
+
+Client -> CORS : PATCH /api/v1/skills/{id}\nOrigin: https://skills.example.com\nAuthorization: Bearer <jwt>\nX-CSRF-Token: <token>
+
+CORS -> CORS : Check Origin\nagainst allowlist
+CORS -> Headers : next()
+
+Headers -> Headers : Queue HSTS, CSP,\nX-Frame-Options headers
+Headers -> RateLimit : next()
+
+RateLimit -> Redis : ZREMRANGEBYSCORE + ZCARD\n(sliding window check)
+Redis --> RateLimit : count: 42
+RateLimit -> RateLimit : 42 < 100, allowed.\nSet X-RateLimit headers.
+RateLimit -> CSRF : next()
+
+CSRF -> Redis : GET csrf:{token}
+Redis --> CSRF : valid (user_id match)
+CSRF -> Redis : DEL csrf:{token}\n(single-use)
+CSRF -> Auth : next()
+
+Auth -> Auth : Validate JWT signature\nand expiration.\nExtract user context.
+Auth -> Validation : next()
+
+Validation -> Validation : Schema validate body.\nStrip unknown fields.\nSanitize HTML.
+Validation -> Controller : next()
+
+Controller -> DB : UPDATE skills SET ...\nWHERE id = $1
+DB --> Controller : Updated row
+Controller --> Client : 200 OK\n+ Security headers\n+ Rate limit headers\n+ Updated resource JSON
+
+@enduml
