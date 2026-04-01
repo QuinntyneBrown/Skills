@@ -69,12 +69,11 @@ export default function LoginPage() {
           <div className={styles.heroText}>
             <h1 className={styles.heroTitle}>Create, manage, and version your skills</h1>
             <p className={styles.heroDescription}>
-              Build reusable skill definitions with a powerful editor, track changes with
-              semantic versioning, and deploy confidently with rollback support.
+              A powerful platform for authoring, organizing, and sharing AI skills with your team.
             </p>
           </div>
         </div>
-        <div className={styles.brandFooter}>&copy; 2026 SkillForge</div>
+        <div className={styles.brandFooter}>&copy; 2026 SkillForge. All rights reserved.</div>
       </div>
 
       {/* Form Panel */}
@@ -82,7 +81,7 @@ export default function LoginPage() {
         <div className={styles.formWrapper}>
           <div className={styles.formHeader}>
             <h2 className={styles.formTitle}>Welcome back</h2>
-            <p className={styles.formSubtitle}>Sign in to your account to continue</p>
+            <p className={styles.formSubtitle}>Enter your credentials to access your account</p>
           </div>
 
           {expired && (
@@ -95,30 +94,36 @@ export default function LoginPage() {
 
           <form className={styles.form} onSubmit={handleSubmit} noValidate>
             <div className={styles.fieldGroup}>
-              <label className={styles.label} htmlFor="email">Email</label>
-              <input
-                id="email"
-                className={styles.input}
-                type="email"
-                placeholder="you@example.com"
+              <label className={styles.label} htmlFor="email">Email address</label>
+              <div className={styles.inputWrapper}>
+                <svg className={styles.inputIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--foreground-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                <input
+                  id="email"
+                  className={styles.inputWithIcon}
+                  type="email"
+                  placeholder="you@company.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 autoComplete="email"
-              />
+                />
+              </div>
               {validationErrors.email && <span className={styles.fieldError}>{validationErrors.email}</span>}
             </div>
 
             <div className={styles.fieldGroup}>
               <label className={styles.label} htmlFor="password">Password</label>
-              <input
-                id="password"
-                className={styles.input}
-                type="password"
-                placeholder="Enter your password"
+              <div className={styles.inputWrapper}>
+                <svg className={styles.inputIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--foreground-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <input
+                  id="password"
+                  className={styles.inputWithIcon}
+                  type="password"
+                  placeholder="••••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="current-password"
-              />
+                />
+              </div>
               {validationErrors.password && <span className={styles.fieldError}>{validationErrors.password}</span>}
             </div>
 

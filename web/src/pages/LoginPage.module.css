@@ -12,62 +12,44 @@
   flex-direction: column;
   justify-content: space-between;
   padding: 60px;
-  background: linear-gradient(135deg, rgba(168, 85, 247, 0.125) 0%, var(--surface-primary) 100%);
-  position: relative;
-  overflow: hidden;
-}
-
-.brandPanel::before {
-  content: '';
-  position: absolute;
-  top: -200px;
-  left: -200px;
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(168, 85, 247, 0.08) 0%, transparent 70%);
-  pointer-events: none;
+  background: linear-gradient(180deg, rgba(168, 85, 247, 0.125) 0%, var(--surface-primary) 100%);
 }
 
 .brandTop {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xl);
-  position: relative;
-  z-index: 1;
 }
 
 .brandLogo {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
+  gap: 10px;
 }
 
 .brandIcon {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   color: var(--accent-primary);
 }
 
 .brandName {
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 24px;
+  font-weight: 700;
   color: var(--foreground-primary);
-  letter-spacing: -0.02em;
 }
 
 .heroText {
-  margin-top: 80px;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: 16px;
 }
 
 .heroTitle {
-  font-size: 40px;
+  font-size: 42px;
   font-weight: 700;
   line-height: 1.15;
   color: var(--foreground-primary);
-  letter-spacing: -0.03em;
   max-width: 480px;
 }
 
@@ -81,8 +63,6 @@
 .brandFooter {
   font-size: 13px;
   color: var(--foreground-muted);
-  position: relative;
-  z-index: 1;
 }
 
 /* ── Form Panel (right) ── */
@@ -119,7 +99,7 @@
 }
 
 .formSubtitle {
-  font-size: 15px;
+  font-size: 14px;
   color: var(--foreground-secondary);
 }
 
@@ -147,11 +127,46 @@
   font-size: 14px;
   font-family: var(--font-body);
   color: var(--foreground-primary);
-  background: var(--surface-tertiary);
+  background: var(--surface-secondary);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
   outline: none;
   transition: border-color 0.15s ease;
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 14px;
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+.inputWithIcon {
+  width: 100%;
+  padding: 10px 14px 10px 38px;
+  font-size: 14px;
+  font-family: var(--font-body);
+  color: var(--foreground-primary);
+  background: var(--surface-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.inputWithIcon::placeholder {
+  color: var(--foreground-muted);
+}
+
+.inputWithIcon:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px var(--accent-primary-muted);
 }
 
 .input::placeholder {
@@ -278,8 +293,8 @@
 
 .switchText {
   text-align: center;
-  font-size: 14px;
-  color: var(--foreground-secondary);
+  font-size: 13px;
+  color: var(--foreground-muted);
 }
 
 .switchLink {

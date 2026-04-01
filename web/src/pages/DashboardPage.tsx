@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../lib/api';
 import { useToast } from '../components/Toast';
 import Sidebar from '../components/Sidebar';
+import Icon from '../components/Icon';
 import { SkeletonTable } from '../components/SkeletonLoader';
 import styles from './DashboardPage.module.css';
 
@@ -116,7 +117,10 @@ export default function DashboardPage() {
             <h1 className={styles.title}>Dashboard</h1>
             <p className={styles.subtitle}>Manage and organize your skills</p>
           </div>
-          <button className={styles.newBtn} onClick={() => navigate('/skills/new')}>+ New Skill</button>
+          <button className={styles.newBtn} onClick={() => navigate('/skills/new')}>
+            <Icon name="plus" size={16} color="var(--foreground-inverse)" />
+            New Skill
+          </button>
         </div>
 
         <div className={styles.toolbar}>

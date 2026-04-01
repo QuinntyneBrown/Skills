@@ -237,7 +237,7 @@
 
 .table thead th {
   text-align: left;
-  padding: 14px 20px;
+  padding: 12px 20px;
   font-size: 12px;
   font-weight: 500;
   color: var(--foreground-muted);

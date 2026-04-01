@@ -4,7 +4,10 @@
       "Read(//c/projects/Skills/tests//**)",
       "Read(//c/projects/Skills/**)",
       "Bash(wc -l /c/projects/Skills/src/**/*.ts)",
-      "Bash(wc -l /c/projects/Skills/web/src/**/*.tsx /c/projects/Skills/web/src/**/*.ts)"
+      "Bash(wc -l /c/projects/Skills/web/src/**/*.tsx /c/projects/Skills/web/src/**/*.ts)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run:*)",
+      "Bash(npx playwright:*)"
     ]
   }
 }

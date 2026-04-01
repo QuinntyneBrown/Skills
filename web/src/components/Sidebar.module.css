@@ -62,13 +62,9 @@
 .active {
   background: var(--accent-primary-muted);
   color: var(--foreground-primary);
+  font-weight: 500;
 }
 
-.navIcon {
-  width: 20px;
-  height: 20px;
-  opacity: 0.7;
-}
 
 .spacer {
   flex: 1;

@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/auth-context';
+import Icon from './Icon';
 import styles from './Sidebar.module.css';
 
 interface SidebarProps {
@@ -33,9 +34,7 @@ export default function Sidebar({ isOpen, onClose, skillId }: SidebarProps) {
       {isOpen && <div className={styles.overlay} onClick={onClose} />}
       <aside className={`${styles.sidebar} ${isOpen ? styles.open : ''}`}>
         <div className={styles.brand}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
-          </svg>
+          <Icon name="sparkles" size={24} color="var(--accent-primary)" />
           <span className={styles.brandName}>SkillForge</span>
         </div>
 
@@ -47,7 +46,7 @@ export default function Sidebar({ isOpen, onClose, skillId }: SidebarProps) {
               className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : ''}`}
               onClick={onClose}
             >
-              <span className={styles.navIcon} data-icon={item.icon} />
+              <Icon name={item.icon} size={20} />
               <span>{item.label}</span>
             </NavLink>
           ))}
@@ -56,7 +55,7 @@ export default function Sidebar({ isOpen, onClose, skillId }: SidebarProps) {
         <div className={styles.spacer} />
 
         <NavLink to="/settings" className={styles.navItem} onClick={onClose}>
-          <span className={styles.navIcon} data-icon="settings" />
+          <Icon name="settings" size={20} />
           <span>Settings</span>
         </NavLink>
 
