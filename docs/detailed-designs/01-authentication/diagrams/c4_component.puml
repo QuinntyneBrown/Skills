@@ -1,0 +1,30 @@
+@startuml c4_component
+!theme plain
+!include <C4/C4_Component>
+
+title Component Diagram - API Server (Auth & Authorization)
+
+Container_Boundary(api, "API Server") {
+    Component(authCtrl, "AuthController", "Controller", "Handles HTTP requests for registration, login, logout, OAuth, token refresh.")
+    Component(authSvc, "AuthService", "Service", "Orchestrates auth workflows: credential validation, OAuth linking, lockout policy.")
+    Component(tokenSvc, "TokenService", "Service", "Issues, rotates, validates, and revokes JWT access tokens and refresh tokens.")
+    Component(roleSvc, "RoleService", "Service", "Evaluates RBAC permissions based on user roles, ownership, and share records.")
+    Component(shareSvc, "ShareService", "Service", "Manages skill_shares records: create, revoke, query.")
+    Component(userRepo, "UserRepository", "Repository", "Data access for users, oauth_accounts, and user_roles tables.")
+}
+
+ContainerDb(db, "PostgreSQL", "Database")
+ContainerDb(redis, "Redis", "Token/session store")
+
+Rel(authCtrl, authSvc, "Delegates auth logic")
+Rel(authCtrl, tokenSvc, "Requests token operations")
+Rel(authSvc, userRepo, "Reads/writes user data")
+Rel(authSvc, tokenSvc, "Issues tokens on login")
+Rel(tokenSvc, redis, "Caches tokens, lockout state")
+Rel(tokenSvc, db, "Persists refresh tokens")
+Rel(roleSvc, userRepo, "Loads user roles")
+Rel(roleSvc, shareSvc, "Checks share permissions")
+Rel(shareSvc, db, "Reads/writes skill_shares")
+Rel(userRepo, db, "Queries users, roles")
+
+@enduml

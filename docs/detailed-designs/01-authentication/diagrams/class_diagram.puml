@@ -1,0 +1,67 @@
+@startuml class_diagram
+!theme plain
+
+title Data Model - Authentication & Authorization Entities
+
+entity "users" as User {
+    * id : UUID <<PK>>
+    --
+    * email : VARCHAR(255) <<UNIQUE>>
+    password_hash : VARCHAR(255)
+    * email_verified : BOOLEAN
+    email_verification_token : VARCHAR(255)
+    email_verification_expires_at : TIMESTAMPTZ
+    * created_at : TIMESTAMPTZ
+    * updated_at : TIMESTAMPTZ
+}
+
+entity "roles" as Role {
+    * id : UUID <<PK>>
+    --
+    * name : VARCHAR(50) <<UNIQUE>>
+}
+
+entity "user_roles" as UserRole {
+    * user_id : UUID <<PK, FK>>
+    * role_id : UUID <<PK, FK>>
+    --
+    * assigned_at : TIMESTAMPTZ
+}
+
+entity "refresh_tokens" as RefreshToken {
+    * id : UUID <<PK>>
+    --
+    * user_id : UUID <<FK>>
+    * token_hash : VARCHAR(255) <<UNIQUE>>
+    * family_id : UUID
+    * expires_at : TIMESTAMPTZ
+    revoked_at : TIMESTAMPTZ
+    * created_at : TIMESTAMPTZ
+}
+
+entity "oauth_accounts" as OAuthAccount {
+    * id : UUID <<PK>>
+    --
+    * user_id : UUID <<FK>>
+    * provider : VARCHAR(50)
+    * provider_user_id : VARCHAR(255)
+    access_token : VARCHAR(512)
+    * created_at : TIMESTAMPTZ
+}
+
+entity "skill_shares" as SkillShare {
+    * id : UUID <<PK>>
+    --
+    * skill_id : UUID <<FK>>
+    * shared_with_user_id : UUID <<FK>>
+    * permission : VARCHAR(20)
+    * created_at : TIMESTAMPTZ
+}
+
+User ||--o{ UserRole : "has"
+Role ||--o{ UserRole : "assigned to"
+User ||--o{ RefreshToken : "owns"
+User ||--o{ OAuthAccount : "linked to"
+User ||--o{ SkillShare : "shared with"
+
+@enduml

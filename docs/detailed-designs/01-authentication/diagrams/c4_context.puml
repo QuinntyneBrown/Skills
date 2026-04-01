@@ -1,0 +1,20 @@
+@startuml c4_context
+!theme plain
+!include <C4/C4_Context>
+
+title System Context - Claude Skills Authentication
+
+Person(user, "User", "A developer who creates, shares, and manages Claude skills via SPA or CLI.")
+
+System(skillsSystem, "Claude Skills System", "Web application for managing Claude skills. Provides auth, RBAC, and skill CRUD.")
+
+System_Ext(github, "GitHub OAuth", "Provides OAuth 2.0 authentication for GitHub users.")
+System_Ext(google, "Google OAuth", "Provides OAuth 2.0 authentication for Google users.")
+System_Ext(emailService, "Email Service", "Sends transactional emails: verification, password reset.")
+
+Rel(user, skillsSystem, "Registers, logs in, manages skills", "HTTPS")
+Rel(skillsSystem, github, "Exchanges OAuth codes for tokens", "HTTPS")
+Rel(skillsSystem, google, "Exchanges OAuth codes for tokens", "HTTPS")
+Rel(skillsSystem, emailService, "Sends verification emails", "SMTP/API")
+
+@enduml

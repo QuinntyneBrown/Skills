@@ -1,0 +1,27 @@
+@startuml c4_container
+!theme plain
+!include <C4/C4_Container>
+
+title Container Diagram - Claude Skills Authentication
+
+Person(user, "User", "Developer using SPA or CLI")
+
+System_Boundary(skills, "Claude Skills System") {
+    Container(spa, "SPA", "TypeScript, React", "Dark-mode single-page application. Holds access token in memory.")
+    Container(api, "API Server", "Node.js / TypeScript", "Stateless REST API at /api/v1/. Handles auth, RBAC, skill CRUD.")
+    ContainerDb(db, "PostgreSQL", "PostgreSQL 15+", "Stores users, roles, refresh tokens, OAuth accounts, skill shares.")
+    ContainerDb(redis, "Redis", "Redis 7+", "Caches refresh tokens, lockout counters, OAuth state parameters.")
+}
+
+System_Ext(email, "Email Service", "Transactional email delivery")
+System_Ext(oauth, "OAuth Providers", "GitHub, Google")
+
+Rel(user, spa, "Uses", "HTTPS")
+Rel(user, api, "CLI requests", "HTTPS")
+Rel(spa, api, "API calls", "HTTPS/JSON")
+Rel(api, db, "Reads/writes", "TCP/5432")
+Rel(api, redis, "Reads/writes", "TCP/6379")
+Rel(api, email, "Sends emails", "HTTPS")
+Rel(api, oauth, "OAuth exchange", "HTTPS")
+
+@enduml
