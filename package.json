@@ -8,7 +8,10 @@
     "start": "node dist/server.js",
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "migrate": "ts-node src/migrations/runner.ts",
-    "migrate:rollback": "ts-node src/migrations/runner.ts rollback"
+    "migrate:rollback": "ts-node src/migrations/runner.ts rollback",
+    "test:e2e": "playwright test",
+    "test:cli": "vitest run --config vitest.config.ts",
+    "test": "npm run test:cli && npm run test:e2e"
   },
   "dependencies": {
     "@node-rs/argon2": "^2.0.2",
@@ -24,6 +27,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@playwright/test": "^1.59.0",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/jsonwebtoken": "^9.0.7",
@@ -32,6 +36,7 @@
     "@types/uuid": "^10.0.0",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.6.0"
+    "typescript": "^5.6.0",
+    "vitest": "^4.1.2"
   }
 }

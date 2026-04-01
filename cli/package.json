@@ -1,0 +1,19 @@
+{
+  "name": "skills-cli",
+  "version": "1.0.0",
+  "description": "CLI for Skills platform",
+  "main": "dist/cli.js",
+  "bin": { "skills": "dist/cli.js" },
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/cli.ts"
+  },
+  "dependencies": {
+    "commander": "^12.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.0"
+  }
+}

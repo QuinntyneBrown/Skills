@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/projects/Skills/tests//**)",
+      "Read(//c/projects/Skills/**)"
+    ]
+  }
+}

@@ -1,0 +1,231 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--surface-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 60;
+}
+
+.dialog {
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  width: 520px;
+  max-width: calc(100% - 32px);
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+}
+
+.header {
+  padding: 24px 24px 0;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--foreground-primary);
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: var(--foreground-muted);
+  margin-top: 4px;
+}
+
+.closeBtn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  color: var(--foreground-muted);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.closeBtn:hover {
+  color: var(--foreground-primary);
+}
+
+.section {
+  padding: 20px 24px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.section:first-of-type {
+  margin-top: 20px;
+}
+
+.sectionTitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--foreground-primary);
+  margin-bottom: 12px;
+}
+
+.radioGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.radioOption {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.radioOption input[type="radio"] {
+  margin-top: 3px;
+  accent-color: var(--accent-primary);
+}
+
+.radioLabel {
+  font-size: 14px;
+  color: var(--foreground-primary);
+  font-weight: 500;
+}
+
+.radioDesc {
+  font-size: 12px;
+  color: var(--foreground-muted);
+  margin-top: 2px;
+}
+
+.shareInput {
+  display: flex;
+  gap: 8px;
+}
+
+.emailInput {
+  flex: 1;
+  padding: 8px 12px;
+  background: var(--surface-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  color: var(--foreground-primary);
+  font-size: 14px;
+  outline: none;
+}
+
+.emailInput::placeholder {
+  color: var(--foreground-muted);
+}
+
+.emailInput:focus {
+  border-color: var(--accent-primary);
+}
+
+.addBtn {
+  padding: 8px 16px;
+  background: var(--accent-primary);
+  color: var(--foreground-inverse);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.addBtn:hover {
+  background: var(--accent-primary-hover);
+}
+
+.userList {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.userRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+}
+
+.userEmail {
+  font-size: 14px;
+  color: var(--foreground-primary);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.userActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.permSelect {
+  padding: 4px 8px;
+  background: var(--surface-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  color: var(--foreground-primary);
+  font-size: 12px;
+  outline: none;
+  cursor: pointer;
+}
+
+.removeBtn {
+  background: none;
+  border: none;
+  color: var(--foreground-muted);
+  cursor: pointer;
+  padding: 4px;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.removeBtn:hover {
+  color: var(--color-error);
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.cancelBtn {
+  padding: 8px 20px;
+  background: var(--surface-tertiary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  color: var(--foreground-primary);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.cancelBtn:hover {
+  border-color: var(--border-strong);
+}
+
+.saveBtn {
+  padding: 8px 20px;
+  background: var(--accent-primary);
+  color: var(--foreground-inverse);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.saveBtn:hover {
+  background: var(--accent-primary-hover);
+}
