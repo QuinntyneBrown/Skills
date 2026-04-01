@@ -301,6 +301,13 @@
   border-radius: var(--radius-md);
 }
 
+.fieldError {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--color-error);
+}
+
 .successMessage {
   padding: 10px 14px;
   font-size: 13px;

@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Read(//c/projects/Skills/tests//**)",
-      "Read(//c/projects/Skills/**)"
+      "Read(//c/projects/Skills/**)",
+      "Bash(wc -l /c/projects/Skills/src/**/*.ts)",
+      "Bash(wc -l /c/projects/Skills/web/src/**/*.tsx /c/projects/Skills/web/src/**/*.ts)"
     ]
   }
 }

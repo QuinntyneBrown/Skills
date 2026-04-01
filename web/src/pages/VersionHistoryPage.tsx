@@ -341,7 +341,7 @@ export default function VersionHistoryPage() {
               <div className={styles.loading}>Loading diff...</div>
             ) : diff && lowerV != null && upperV != null ? (
               <>
-                <div className={styles.diffHeader}>
+                <div className={styles.diffHeader} data-testid="diff-viewer">
                   <span className={styles.diffTitle}>
                     Comparing v{lowerV} &rarr; v{upperV}
                   </span>
@@ -378,6 +378,7 @@ export default function VersionHistoryPage() {
                                   ? styles.lineRemoved
                                   : styles.lineUnchanged
                             }`}
+                            data-testid={line.type === 'add' ? 'diff-addition' : line.type === 'remove' ? 'diff-deletion' : undefined}
                           >
                             <span className={styles.lineNumber}>
                               {line.type === 'remove'

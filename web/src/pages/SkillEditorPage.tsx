@@ -71,6 +71,7 @@ export default function SkillEditorPage() {
   const [activeTab, setActiveTab] = useState<'editor' | 'preview' | 'meta'>('editor');
   const [cursorLine, setCursorLine] = useState(1);
   const [cursorCol, setCursorCol] = useState(1);
+  const [nameError, setNameError] = useState('');
 
   const editorRef = useRef<EditorInstance | null>(null);
 
@@ -101,8 +102,15 @@ export default function SkillEditorPage() {
 
   // Save handler
   const handleSave = useCallback(async () => {
+    setNameError('');
     if (!name.trim()) {
+      setNameError('Name is required');
       showToast('warning', 'Skill name is required');
+      return;
+    }
+    if (name.trim().length > 200) {
+      setNameError('Name must be 200 characters or fewer');
+      showToast('warning', 'Name is too long (max 200 characters)');
       return;
     }
     setSaving(true);
@@ -183,7 +191,7 @@ export default function SkillEditorPage() {
         {/* Top Bar */}
         <div className={styles.topBar}>
           <div className={styles.topBarLeft}>
-            <button className={styles.backBtn} onClick={() => navigate('/dashboard')} aria-label="Back">
+            <button className={styles.backBtn} onClick={() => navigate('/dashboard')} aria-label="Back" data-testid="back-button">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="m15 18-6-6 6-6" />
               </svg>
@@ -222,18 +230,21 @@ export default function SkillEditorPage() {
         <div className={styles.formSection}>
           <div className={styles.formGrid}>
             <div className={styles.formField}>
-              <label className={styles.formLabel}>Name</label>
+              <label className={styles.formLabel} htmlFor="skill-name">Name</label>
               <input
+                id="skill-name"
                 className={styles.formInput}
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Skill name..."
               />
+              {nameError && <span className={styles.fieldError}>{nameError}</span>}
             </div>
             <div className={styles.formField}>
-              <label className={styles.formLabel}>Description</label>
+              <label className={styles.formLabel} htmlFor="skill-description">Description</label>
               <textarea
+                id="skill-description"
                 className={styles.formTextarea}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
@@ -255,16 +266,20 @@ export default function SkillEditorPage() {
         </div>
 
         {/* Tabs (tablet / mobile) */}
-        <div className={styles.tabs}>
+        <div className={styles.tabs} role="tablist">
           <button
+            role="tab"
             className={`${styles.tab} ${activeTab === 'editor' ? styles.tabActive : ''}`}
             onClick={() => setActiveTab('editor')}
+            aria-selected={activeTab === 'editor'}
           >
             Editor
           </button>
           <button
+            role="tab"
             className={`${styles.tab} ${activeTab === 'preview' ? styles.tabActive : ''}`}
             onClick={() => setActiveTab('preview')}
+            aria-selected={activeTab === 'preview'}
           >
             Preview
           </button>
@@ -274,7 +289,7 @@ export default function SkillEditorPage() {
         <div className={styles.splitPane}>
           {(activeTab === 'editor' || typeof window !== 'undefined') && (
             <div className={styles.editorPane} style={activeTab === 'preview' ? { display: 'none' } : undefined}>
-              <div className={styles.editorWrapper}>
+              <div className={styles.editorWrapper} data-testid="skill-editor">
                 <Editor
                   height="100%"
                   language="markdown"
@@ -305,6 +320,7 @@ export default function SkillEditorPage() {
           )}
           <div
             className={styles.previewPane}
+            data-testid="preview-pane"
             style={activeTab === 'editor' ? undefined : undefined}
           >
             {content ? (
@@ -321,7 +337,7 @@ export default function SkillEditorPage() {
         </div>
 
         {/* Status Bar */}
-        <div className={styles.statusBar}>
+        <div className={styles.statusBar} data-testid="editor-status">
           <div className={styles.statusLeft}>
             <span>Ln {cursorLine}, Col {cursorCol}</span>
           </div>

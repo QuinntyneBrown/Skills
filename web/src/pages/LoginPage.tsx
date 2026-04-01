@@ -13,6 +13,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(false);
   const [error, setError] = useState('');
+  const [validationErrors, setValidationErrors] = useState<{ email?: string; password?: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const expired = searchParams.get('expired') === 'true';
@@ -27,13 +28,26 @@ export default function LoginPage() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError('');
+    setValidationErrors({});
+
+    // Client-side validation
+    const errors: { email?: string; password?: string } = {};
+    if (!email.trim()) errors.email = 'Email is required';
+    if (!password) errors.password = 'Password is required';
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       await login(email, password);
       navigate(from, { replace: true });
     } catch (err: unknown) {
+      const axErr = err as { response?: { data?: { error?: { message?: string }; message?: string } } };
       const msg =
-        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        axErr?.response?.data?.error?.message ||
+        axErr?.response?.data?.message ||
         'Invalid email or password. Please try again.';
       setError(msg);
     } finally {
@@ -79,7 +93,7 @@ export default function LoginPage() {
 
           {error && <div className={styles.errorMessage}>{error}</div>}
 
-          <form className={styles.form} onSubmit={handleSubmit}>
+          <form className={styles.form} onSubmit={handleSubmit} noValidate>
             <div className={styles.fieldGroup}>
               <label className={styles.label} htmlFor="email">Email</label>
               <input
@@ -89,9 +103,9 @@ export default function LoginPage() {
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                required
                 autoComplete="email"
               />
+              {validationErrors.email && <span className={styles.fieldError}>{validationErrors.email}</span>}
             </div>
 
             <div className={styles.fieldGroup}>
@@ -103,9 +117,9 @@ export default function LoginPage() {
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required
                 autoComplete="current-password"
               />
+              {validationErrors.password && <span className={styles.fieldError}>{validationErrors.password}</span>}
             </div>
 
             <div className={styles.formOptions}>

@@ -184,6 +184,13 @@
   color: var(--foreground-secondary);
 }
 
+.fieldError {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--color-error);
+}
+
 .formInput {
   padding: 8px 12px;
   background: var(--surface-primary);

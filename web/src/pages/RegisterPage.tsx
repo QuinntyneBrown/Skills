@@ -29,8 +29,8 @@ export default function RegisterPage() {
       return;
     }
 
-    if (password.length < 8) {
-      setError('Password must be at least 8 characters.');
+    if (password.length < 12) {
+      setError('Password must be at least 12 characters for complexity requirements.');
       return;
     }
 
@@ -40,8 +40,10 @@ export default function RegisterPage() {
       setSuccess(data.message || 'Account created successfully. You can now sign in.');
       setTimeout(() => navigate('/login'), 2000);
     } catch (err: unknown) {
+      const axErr = err as { response?: { data?: { error?: { message?: string }; message?: string } } };
       const msg =
-        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        axErr?.response?.data?.error?.message ||
+        axErr?.response?.data?.message ||
         'Registration failed. Please try again.';
       setError(msg);
     } finally {
@@ -103,11 +105,11 @@ export default function RegisterPage() {
                 id="password"
                 className={styles.input}
                 type="password"
-                placeholder="At least 8 characters"
+                placeholder="At least 12 characters"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                minLength={8}
+                minLength={12}
                 autoComplete="new-password"
               />
             </div>
@@ -122,7 +124,7 @@ export default function RegisterPage() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
-                minLength={8}
+                minLength={12}
                 autoComplete="new-password"
               />
             </div>

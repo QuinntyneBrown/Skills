@@ -15,7 +15,7 @@ export class LoginPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.brandName = page.getByText('SkillForge');
+    this.brandName = page.getByText('SkillForge', { exact: true });
     this.heading = page.getByText('Welcome back');
     this.emailInput = page.getByLabel(/email/i);
     this.passwordInput = page.getByLabel(/password/i);
