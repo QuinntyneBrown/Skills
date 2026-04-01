@@ -29,21 +29,20 @@ This feature provides complete revision history for skills. Every update to a sk
 
 Users interact with the Claude Skills System to manage skills and their version history. The system stores all version data in PostgreSQL.
 
-![C4 Context Diagram](diagrams/c4_context.puml)
+![C4 Context Diagram](diagrams/c4_context.png)
 
-> Render `diagrams/c4_context.puml` with any PlantUML renderer.
 
 ### 2.2 Container View
 
 The API Server handles version-related requests, reads and writes version records in PostgreSQL, and uses Redis to cache frequently accessed version metadata.
 
-![C4 Container Diagram](diagrams/c4_container.puml)
+![C4 Container Diagram](diagrams/c4_container.png)
 
 ### 2.3 Component View (API Server)
 
 Inside the API server, versioning is handled by four components working together:
 
-![C4 Component Diagram](diagrams/c4_component.puml)
+![C4 Component Diagram](diagrams/c4_component.png)
 
 | Component | Responsibility |
 |-----------|---------------|
@@ -112,7 +111,7 @@ Inside the API server, versioning is handled by four components working together
 
 ## 4. Data Model
 
-![Class Diagram](diagrams/class_diagram.puml)
+![Class Diagram](diagrams/class_diagram.png)
 
 ### 4.1 Tables
 
@@ -153,7 +152,7 @@ This means the current state of a skill is always in the `skills` table, while `
 
 ### 5.1 Version Creation on Skill Update
 
-![Version Create Sequence](diagrams/sequence_version_create.puml)
+![Version Create Sequence](diagrams/sequence_version_create.png)
 
 1. User sends `PUT /api/v1/skills/{id}` with updated skill content and the current `version` for optimistic concurrency.
 2. `SkillController` delegates to `SkillService.update()`.
@@ -183,7 +182,7 @@ This means the current state of a skill is always in the `skills` table, while `
 
 ### 5.4 Compute Diff Between Versions
 
-![Diff Sequence](diagrams/sequence_diff.puml)
+![Diff Sequence](diagrams/sequence_diff.png)
 
 1. User sends `GET /api/v1/skills/{id}/versions/{v1}/diff/{v2}`.
 2. `VersionController` validates both version numbers and that the user has read access.
@@ -197,7 +196,7 @@ This means the current state of a skill is always in the `skills` table, while `
 
 ### 5.5 Restore a Previous Version
 
-![Restore Sequence](diagrams/sequence_restore.puml)
+![Restore Sequence](diagrams/sequence_restore.png)
 
 1. User sends `POST /api/v1/skills/{id}/versions/{version}/restore`.
 2. `VersionController` validates the user has write access to the skill.

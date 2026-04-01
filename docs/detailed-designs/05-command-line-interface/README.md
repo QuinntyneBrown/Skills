@@ -19,7 +19,7 @@ The CLI communicates exclusively with the RESTful API at `/api/v1/` and adds no 
 
 ### 2.1 C4 Context Diagram
 
-![C4 Context](diagrams/c4_context.puml)
+![C4 Context](diagrams/c4_context.png)
 
 The CLI sits between the human user (or CI runner) and the Skills API Server. External collaborators include the OS Keychain for secure credential storage and the system browser for OAuth flows.
 
@@ -33,7 +33,7 @@ The CLI sits between the human user (or CI runner) and the Skills API Server. Ex
 
 ### 2.2 C4 Container Diagram
 
-![C4 Container](diagrams/c4_container.puml)
+![C4 Container](diagrams/c4_container.png)
 
 | Container        | Technology | Responsibility                                |
 | ---------------- | ---------- | --------------------------------------------- |
@@ -43,7 +43,7 @@ The CLI sits between the human user (or CI runner) and the Skills API Server. Ex
 
 ### 2.3 C4 Component Diagram
 
-![C4 Component](diagrams/c4_component.puml)
+![C4 Component](diagrams/c4_component.png)
 
 The CLI binary is decomposed into the following internal components:
 
@@ -225,7 +225,7 @@ Manages persistent user preferences stored in `~/.config/skills/config.json` (re
 
 ### 4.1 Class Diagram
 
-![Class Diagram](diagrams/class_diagram.puml)
+![Class Diagram](diagrams/class_diagram.png)
 
 ### 4.2 CliConfig
 
@@ -275,7 +275,7 @@ Represents a skill as returned by the API and consumed by OutputFormatter.
 
 ### 5.1 First-Time Login (Browser OAuth)
 
-![Login Sequence](diagrams/sequence_login.puml)
+![Login Sequence](diagrams/sequence_login.png)
 
 1. User runs `skills login`.
 2. CommandRouter dispatches to the login handler.
@@ -303,7 +303,7 @@ For any command that requires authentication:
 
 ### 5.3 Create Skill from File
 
-![Create Sequence](diagrams/sequence_create.puml)
+![Create Sequence](diagrams/sequence_create.png)
 
 1. User runs `skills create --name "My Skill" --body-file ./skill.md --tags "go,cli"`.
 2. CommandRouter parses flags and validates: `--name` is required, `--body-file` must exist and be readable.
@@ -318,7 +318,7 @@ For any command that requires authentication:
 
 ### 5.4 Edit Skill in $EDITOR
 
-![Edit Sequence](diagrams/sequence_edit.puml)
+![Edit Sequence](diagrams/sequence_edit.png)
 
 1. User runs `skills edit abc-123`.
 2. Handler calls `GET /api/v1/skills/abc-123` to fetch the current skill.

@@ -31,21 +31,20 @@ This feature provides identity management, session handling, and access control 
 
 The Claude Skills system interacts with external OAuth providers (GitHub, Google) and an email delivery service for verification emails.
 
-![C4 Context Diagram](diagrams/c4_context.puml)
+![C4 Context Diagram](diagrams/c4_context.png)
 
-> Render `diagrams/c4_context.puml` with any PlantUML renderer.
 
 ### 2.2 Container View
 
 The application consists of a Single-Page Application (SPA), a stateless REST API server, a PostgreSQL database, and a Redis instance for token/session storage.
 
-![C4 Container Diagram](diagrams/c4_container.puml)
+![C4 Container Diagram](diagrams/c4_container.png)
 
 ### 2.3 Component View (API Server)
 
 Inside the API server, authentication and authorization are handled by the following components:
 
-![C4 Component Diagram](diagrams/c4_component.puml)
+![C4 Component Diagram](diagrams/c4_component.png)
 
 | Component | Responsibility |
 |-----------|---------------|
@@ -170,7 +169,7 @@ Inside the API server, authentication and authorization are handled by the follo
 
 ## 4. Data Model
 
-![Class Diagram](diagrams/class_diagram.puml)
+![Class Diagram](diagrams/class_diagram.png)
 
 ### 4.1 Tables
 
@@ -253,7 +252,7 @@ Inside the API server, authentication and authorization are handled by the follo
 
 ### 5.1 Registration (Email/Password)
 
-![Registration Sequence](diagrams/sequence_registration.puml)
+![Registration Sequence](diagrams/sequence_registration.png)
 
 1. User submits email and password to `POST /api/v1/auth/register`.
 2. `AuthController` validates input format.
@@ -268,7 +267,7 @@ Inside the API server, authentication and authorization are handled by the follo
 
 ### 5.2 Login (Email/Password)
 
-![Login Sequence](diagrams/sequence_login.puml)
+![Login Sequence](diagrams/sequence_login.png)
 
 1. User submits email and password to `POST /api/v1/auth/login`.
 2. `AuthService` loads user by email. If not found, returns generic `401 Invalid credentials`.
@@ -291,7 +290,7 @@ Inside the API server, authentication and authorization are handled by the follo
 
 ### 5.4 OAuth Login
 
-![OAuth Sequence](diagrams/sequence_oauth.puml)
+![OAuth Sequence](diagrams/sequence_oauth.png)
 
 1. Client calls `POST /api/v1/auth/oauth/{provider}` (provider: `github` or `google`).
 2. API returns `{ authorizationUrl }` with a CSRF `state` parameter stored in Redis (5-min TTL).
@@ -323,7 +322,7 @@ Inside the API server, authentication and authorization are handled by the follo
 
 ### 5.7 RBAC Check
 
-![RBAC Sequence](diagrams/sequence_rbac_check.puml)
+![RBAC Sequence](diagrams/sequence_rbac_check.png)
 
 1. A request arrives at any protected endpoint (e.g., `PUT /api/v1/skills/{id}`).
 2. `AuthMiddleware` extracts the JWT from the `Authorization: Bearer {token}` header, validates signature and expiry.

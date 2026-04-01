@@ -38,13 +38,13 @@ Architecture diagrams follow the C4 model. PlantUML sources are in `./diagrams/`
 
 ### 2.1 Context (C4 Level 1)
 
-![C4 Context](diagrams/c4_context.puml)
+![C4 Context](diagrams/c4_context.png)
 
 The Skills System exposes a search API consumed by authenticated users through the Web UI or CLI. PostgreSQL provides storage and full-text search indexing. Redis caches frequently executed queries.
 
 ### 2.2 Container (C4 Level 2)
 
-![C4 Container](diagrams/c4_container.puml)
+![C4 Container](diagrams/c4_container.png)
 
 | Container           | Technology              | Responsibility                                  |
 | ------------------- | ----------------------- | ----------------------------------------------- |
@@ -54,7 +54,7 @@ The Skills System exposes a search API consumed by authenticated users through t
 
 ### 2.3 Component (C4 Level 3)
 
-![C4 Component](diagrams/c4_component.puml)
+![C4 Component](diagrams/c4_component.png)
 
 | Component       | Responsibility                                                                 |
 | --------------- | ------------------------------------------------------------------------------ |

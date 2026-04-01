@@ -33,7 +33,7 @@ The security design follows the OWASP Top 10 mitigation framework and implements
 
 Clients interact with the API system, which depends on PostgreSQL for persistence and Redis for rate limiting and caching.
 
-![C4 Context](diagrams/c4_context.puml)
+![C4 Context](diagrams/c4_context.png)
 
 **Participants:**
 
@@ -49,13 +49,13 @@ Clients interact with the API system, which depends on PostgreSQL for persistenc
 
 ### 2.2 C4 Container Diagram
 
-![C4 Container](diagrams/c4_container.puml)
+![C4 Container](diagrams/c4_container.png)
 
 The API Server container hosts the middleware pipeline, controllers, and the OpenAPI generator. Redis handles rate limit state with sub-millisecond lookups. PostgreSQL stores API key hashes and all persistent data. A CDN/WAF sits in front for TLS termination and coarse-grained traffic filtering.
 
 ### 2.3 C4 Component Diagram
 
-![C4 Component](diagrams/c4_component.puml)
+![C4 Component](diagrams/c4_component.png)
 
 Inside the API Server, the request pipeline is composed of ordered middleware:
 
@@ -240,7 +240,7 @@ Rate limit state is stored entirely in Redis. No PostgreSQL table is needed.
 
 ### 4.4 Class Diagram
 
-![Class Diagram](diagrams/class_diagram.puml)
+![Class Diagram](diagrams/class_diagram.png)
 
 ---
 
@@ -248,7 +248,7 @@ Rate limit state is stored entirely in Redis. No PostgreSQL table is needed.
 
 ### 5.1 Request Pipeline (Full Middleware Chain)
 
-![Sequence: Request Pipeline](diagrams/sequence_request_pipeline.puml)
+![Sequence: Request Pipeline](diagrams/sequence_request_pipeline.png)
 
 1. Client sends `PATCH /api/v1/skills/{id}` with `Authorization: Bearer <jwt>` and `X-CSRF-Token: <token>`.
 2. **CorsMiddleware**: Checks `Origin` against allowlist. Passes.
@@ -263,7 +263,7 @@ Rate limit state is stored entirely in Redis. No PostgreSQL table is needed.
 
 ### 5.2 Rate Limit Check
 
-![Sequence: Rate Limit](diagrams/sequence_rate_limit.puml)
+![Sequence: Rate Limit](diagrams/sequence_rate_limit.png)
 
 1. RateLimitMiddleware receives the request.
 2. Determines the rate limit key (`user:<id>` if authenticated, `ip:<addr>` if not).

@@ -38,21 +38,20 @@ This feature provides structured logging, audit trails, health monitoring, metri
 
 The Claude Skills system exports logs to a centralized log aggregator, metrics to Prometheus/Grafana, and receives alerts from an alerting system when thresholds are breached.
 
-![C4 Context Diagram](diagrams/c4_context.puml)
+![C4 Context Diagram](diagrams/c4_context.png)
 
-> Render `diagrams/c4_context.puml` with any PlantUML renderer.
 
 ### 2.2 Container View
 
 The API Server is stateless and sits behind a load balancer. PostgreSQL provides persistent storage, Redis provides caching and rate-limit state, Prometheus scrapes metrics, and log output is shipped to a centralized aggregator.
 
-![C4 Container Diagram](diagrams/c4_container.puml)
+![C4 Container Diagram](diagrams/c4_container.png)
 
 ### 2.3 Component View (API Server)
 
 Inside the API server, observability and resilience are handled by middleware and services that intercept every request.
 
-![C4 Component Diagram](diagrams/c4_component.puml)
+![C4 Component Diagram](diagrams/c4_component.png)
 
 | Component | Responsibility |
 |-----------|---------------|
@@ -245,7 +244,7 @@ Inside the API server, observability and resilience are handled by middleware an
 
 ## 4. Data Model
 
-![Class Diagram](diagrams/class_diagram.puml)
+![Class Diagram](diagrams/class_diagram.png)
 
 ### 4.1 Tables
 
@@ -339,7 +338,7 @@ interface AuditLogEntry {
 
 ### 5.1 Request Logging Pipeline
 
-![Request Logging Sequence](diagrams/sequence_request_logging.puml)
+![Request Logging Sequence](diagrams/sequence_request_logging.png)
 
 1. An HTTP request arrives at the API server.
 2. `CorrelationIdMiddleware` checks for `X-Correlation-ID` header. If absent, generates a UUIDv4 and attaches it to the request context.
@@ -352,7 +351,7 @@ interface AuditLogEntry {
 
 ### 5.2 Audit Log Creation
 
-![Audit Log Sequence](diagrams/sequence_audit.puml)
+![Audit Log Sequence](diagrams/sequence_audit.png)
 
 1. A mutation request (e.g., `PUT /api/v1/skills/{id}`) completes successfully.
 2. The controller calls `AuditService.log()` with `action`, `resource_type`, `resource_id`, `user_id`, and `before`/`after` snapshots.
@@ -373,7 +372,7 @@ interface AuditLogEntry {
 
 ### 5.4 Cache-Aside Read Pattern
 
-![Cache-Aside Sequence](diagrams/sequence_cache_aside.puml)
+![Cache-Aside Sequence](diagrams/sequence_cache_aside.png)
 
 1. A request arrives at `GET /api/v1/skills/{id}`.
 2. The service layer calls `CacheService.get("skill:{id}")`.

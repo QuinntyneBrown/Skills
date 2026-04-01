@@ -47,7 +47,7 @@ This document describes the design for creating, reading, updating, and deleting
 
 The Skills Management System is used by authenticated users who interact through a web UI, CLI, or direct API calls. The API server persists data in PostgreSQL and uses Redis for caching.
 
-![C4 Context Diagram](diagrams/c4_context.puml)
+![C4 Context Diagram](diagrams/c4_context.png)
 
 ### 2.2 Container View (C4 Level 2)
 
@@ -60,7 +60,7 @@ The system is composed of four containers:
 | PostgreSQL      | PostgreSQL 16    | Primary data store |
 | Redis Cache     | Redis 7          | Read-through cache for hot skill data |
 
-![C4 Container Diagram](diagrams/c4_container.puml)
+![C4 Container Diagram](diagrams/c4_container.png)
 
 ### 2.3 Component View (C4 Level 3)
 
@@ -74,7 +74,7 @@ Inside the API Server, the following components handle skill operations:
 | SkillRepository          | SQL query construction, database access |
 | CacheService             | Read-through caching, cache invalidation on write |
 
-![C4 Component Diagram](diagrams/c4_component.puml)
+![C4 Component Diagram](diagrams/c4_component.png)
 
 ---
 
@@ -163,7 +163,7 @@ Inside the API Server, the following components handle skill operations:
 
 ### 4.1 Entity-Relationship Overview
 
-![Class Diagram](diagrams/class_diagram.puml)
+![Class Diagram](diagrams/class_diagram.png)
 
 ### 4.2 Skill Entity
 
@@ -265,7 +265,7 @@ This approach avoids pessimistic locks and is well-suited to the expected low-co
 
 ### 5.1 Create Skill
 
-![Create Skill Sequence](diagrams/sequence_create.puml)
+![Create Skill Sequence](diagrams/sequence_create.png)
 
 1. Client sends `POST /api/v1/skills` with JWT and request body.
 2. AuthorizationMiddleware validates the JWT, extracts user ID and role.
@@ -283,7 +283,7 @@ This approach avoids pessimistic locks and is well-suited to the expected low-co
 
 ### 5.2 Update Skill
 
-![Update Skill Sequence](diagrams/sequence_update.puml)
+![Update Skill Sequence](diagrams/sequence_update.png)
 
 1. Client sends `PATCH /api/v1/skills/{id}` with JWT, request body, and `version` field.
 2. AuthorizationMiddleware validates JWT.
@@ -297,7 +297,7 @@ This approach avoids pessimistic locks and is well-suited to the expected low-co
 
 ### 5.3 Delete Skill (Soft Delete)
 
-![Delete Skill Sequence](diagrams/sequence_delete.puml)
+![Delete Skill Sequence](diagrams/sequence_delete.png)
 
 1. Client sends `DELETE /api/v1/skills/{id}` with JWT.
 2. AuthorizationMiddleware validates JWT.
@@ -314,7 +314,7 @@ This approach avoids pessimistic locks and is well-suited to the expected low-co
 
 ### 5.4 List Skills (Paginated with Authorization)
 
-![List Skills Sequence](diagrams/sequence_list.puml)
+![List Skills Sequence](diagrams/sequence_list.png)
 
 1. Client sends `GET /api/v1/skills?page=1&page_size=25` with JWT.
 2. AuthorizationMiddleware validates JWT, resolves user role.

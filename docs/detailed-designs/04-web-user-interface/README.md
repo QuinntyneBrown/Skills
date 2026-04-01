@@ -26,7 +26,7 @@ The SPA communicates exclusively with the backend RESTful API at `/api/v1/`. Aut
 
 The user interacts with the SPA in their browser. The SPA communicates with the API Server over HTTPS. No other external systems are accessed directly from the browser.
 
-See: [`diagrams/c4_context.puml`](diagrams/c4_context.puml)
+See: [`diagrams/c4_context.puml`](diagrams/c4_context.png)
 
 ### 2.2 C4 Container
 
@@ -40,7 +40,7 @@ The deployment consists of three containers:
 
 The CDN serves the initial HTML shell and static assets. Once loaded, the SPA hydrates and communicates directly with the API Server. The API Server returns JSON responses; it never serves HTML to the SPA.
 
-See: [`diagrams/c4_container.puml`](diagrams/c4_container.puml)
+See: [`diagrams/c4_container.puml`](diagrams/c4_container.png)
 
 ### 2.3 C4 Component (SPA Internals)
 
@@ -63,7 +63,7 @@ The SPA is organized into the following major components:
 | **OfflineQueue** | Detects connectivity loss, queues pending mutations in IndexedDB, syncs on reconnect |
 | **SkeletonLoader** | Reusable shimmer placeholder matching the shape of skill cards, editor chrome, etc. |
 
-See: [`diagrams/c4_component.puml`](diagrams/c4_component.puml)
+See: [`diagrams/c4_component.puml`](diagrams/c4_component.png)
 
 ---
 
@@ -283,7 +283,7 @@ Uses CSS `@keyframes` shimmer animation. Rendered during `loading` states to avo
 
 The application uses React Context for global state (auth, offline) and a combination of React Query (TanStack Query) for server state and local component state for UI state.
 
-See: [`diagrams/class_diagram.puml`](diagrams/class_diagram.puml)
+See: [`diagrams/class_diagram.puml`](diagrams/class_diagram.png)
 
 ### 4.1 AuthState
 
@@ -389,7 +389,7 @@ interface OfflineQueueEntry {
 
 ### 5.1 Page Load and Auth Check
 
-See: [`diagrams/sequence_dashboard_load.puml`](diagrams/sequence_dashboard_load.puml)
+See: [`diagrams/sequence_dashboard_load.puml`](diagrams/sequence_dashboard_load.png)
 
 1. Browser requests the SPA from CDN.
 2. CDN returns the HTML shell and JS bundles.
@@ -407,7 +407,7 @@ See: [`diagrams/sequence_dashboard_load.puml`](diagrams/sequence_dashboard_load.
 
 ### 5.3 Create/Edit Skill in Editor
 
-See: [`diagrams/sequence_edit_skill.puml`](diagrams/sequence_edit_skill.puml)
+See: [`diagrams/sequence_edit_skill.puml`](diagrams/sequence_edit_skill.png)
 
 **Edit Flow:**
 1. User navigates to `/skills/:id/edit`.
@@ -426,7 +426,7 @@ See: [`diagrams/sequence_edit_skill.puml`](diagrams/sequence_edit_skill.puml)
 
 ### 5.4 Offline Editing and Sync
 
-See: [`diagrams/sequence_offline_sync.puml`](diagrams/sequence_offline_sync.puml)
+See: [`diagrams/sequence_offline_sync.puml`](diagrams/sequence_offline_sync.png)
 
 1. User is editing a skill. Browser loses network connectivity.
 2. `OfflineQueue` detects `offline` event. Banner displayed: "You are offline."
