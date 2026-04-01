@@ -82,9 +82,9 @@ export const config = {
   },
 
   rateLimit: {
-    authenticated: { maxRequests: 100, windowMs: 60_000 },
-    unauthenticated: { maxRequests: 20, windowMs: 60_000 },
-    auth: { maxRequests: 20, windowMs: 60_000 },
+    authenticated: { maxRequests: 1000, windowMs: 60_000 },
+    unauthenticated: { maxRequests: 200, windowMs: 60_000 },
+    auth: { maxRequests: 200, windowMs: 60_000 },
   },
 
   cache: {

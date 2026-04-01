@@ -5,19 +5,23 @@ import styles from './Sidebar.module.css';
 interface SidebarProps {
   isOpen?: boolean;
   onClose?: () => void;
+  skillId?: string;
 }
 
-const navItems = [
-  { to: '/dashboard', icon: 'layout-dashboard', label: 'Dashboard' },
-  { to: '/dashboard?view=my', icon: 'file-text', label: 'My Skills' },
-  { to: '/dashboard?view=shared', icon: 'users', label: 'Shared with me' },
-  { to: '/dashboard?view=versions', icon: 'git-branch', label: 'Versions' },
-  { to: '/dashboard?view=search', icon: 'search', label: 'Search' },
-];
+function getNavItems(skillId?: string) {
+  return [
+    { to: '/dashboard', icon: 'layout-dashboard', label: 'Dashboard' },
+    { to: '/dashboard?view=my', icon: 'file-text', label: 'My Skills' },
+    { to: '/dashboard?view=shared', icon: 'users', label: 'Shared with me' },
+    { to: skillId ? `/skills/${skillId}/versions` : '/dashboard?view=versions', icon: 'git-branch', label: 'Versions' },
+    { to: '/dashboard?view=search', icon: 'search', label: 'Search' },
+  ];
+}
 
-export default function Sidebar({ isOpen, onClose }: SidebarProps) {
+export default function Sidebar({ isOpen, onClose, skillId }: SidebarProps) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const navItems = getNavItems(skillId);
 
   const handleLogout = async () => {
     await logout();

@@ -19,6 +19,7 @@ export class ErrorPage {
     await this.page.route('**/api/v1/skills*', (route) =>
       route.fulfill({
         status: 500,
+        contentType: 'application/json',
         body: JSON.stringify({
           error: {
             code: 'INTERNAL_ERROR',
@@ -38,6 +39,7 @@ export class ErrorPage {
     await this.page.route('**/api/v1/skills*', (route) =>
       route.fulfill({
         status: 401,
+        contentType: 'application/json',
         body: JSON.stringify({
           error: { code: 'UNAUTHORIZED', message: 'Token expired' },
         }),
@@ -47,7 +49,11 @@ export class ErrorPage {
 
   async setFakeToken() {
     await this.page.evaluate(() => {
-      sessionStorage.setItem('accessToken', 'fake-expired-token');
+      // Create a valid-looking JWT so AuthProvider can parse it
+      const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
+      const payload = btoa(JSON.stringify({ sub: 'fake-user-id', roles: ['user'], exp: Math.floor(Date.now() / 1000) - 3600 }));
+      const signature = 'fake-signature';
+      sessionStorage.setItem('accessToken', `${header}.${payload}.${signature}`);
     });
   }
 }

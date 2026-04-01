@@ -12,7 +12,7 @@ export class DeleteDialog {
     this.heading = page.getByText(/delete skill/i);
     this.recoveryInfo = page.getByText(/soft.delete|recover/i);
     this.cancelButton = page.getByRole('button', { name: /cancel/i });
-    this.deleteButton = page.getByRole('button', { name: /delete/i });
+    this.deleteButton = page.getByRole('button', { name: 'Delete', exact: true });
   }
 
   async cancel() {

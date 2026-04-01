@@ -8,8 +8,8 @@ export class RegisterPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.emailInput = page.getByLabel(/email/i);
-    this.passwordInput = page.getByLabel(/password/i);
+    this.emailInput = page.getByLabel('Email');
+    this.passwordInput = page.getByLabel('Password', { exact: true });
     this.submitButton = page.getByRole('button', { name: /sign up|create account|register/i });
   }
 

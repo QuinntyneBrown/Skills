@@ -70,11 +70,11 @@ export default function VersionHistoryPage() {
     setError(null);
     try {
       const [skillRes, versionsRes] = await Promise.all([
-        api.get<SkillDetail>(`/skills/${id}`),
-        api.get<SkillVersion[]>(`/skills/${id}/versions`),
+        api.get<{ data: SkillDetail }>(`/skills/${id}`),
+        api.get<{ data: SkillVersion[]; pagination: unknown }>(`/skills/${id}/versions`),
       ]);
-      setSkill(skillRes.data);
-      const sorted = [...versionsRes.data].sort(
+      setSkill(skillRes.data.data);
+      const sorted = [...versionsRes.data.data].sort(
         (a, b) => b.version_number - a.version_number
       );
       setVersions(sorted);
@@ -85,6 +85,27 @@ export default function VersionHistoryPage() {
         setCompareVersion(sorted[1].version_number);
       } else if (sorted.length === 1) {
         setSelectedVersion(sorted[0].version_number);
+        // Generate a synthetic diff for single version (show all content as additions)
+        const singleVersion = sorted[0];
+        const bodyLines = (singleVersion.body || '').split('\n');
+        const syntheticDiff: VersionDiffResponse = {
+          diffs: [
+            {
+              field: 'body',
+              changes: bodyLines.map((line, idx) => ({
+                type: 'add' as const,
+                content: line,
+                newLineNumber: idx + 1,
+              })),
+            },
+          ],
+          stats: {
+            additions: bodyLines.length,
+            deletions: 0,
+          },
+        };
+        setDiff(syntheticDiff);
+        setCompareVersion(0); // virtual "empty" version
       }
     } catch (err: unknown) {
       const axErr = err as { response?: { data?: { error?: { message?: string } }; status?: number } };
@@ -110,6 +131,10 @@ export default function VersionHistoryPage() {
     const upper = Math.max(selectedVersion, compareVersion);
     if (lower === upper) {
       setDiff(null);
+      return;
+    }
+    // Skip API fetch for synthetic diff (compareVersion === 0 means initial empty state)
+    if (lower === 0) {
       return;
     }
 

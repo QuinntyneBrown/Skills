@@ -24,6 +24,14 @@ router.post('/login', validate(loginSchema), async (req: Request, res: Response,
       user_agent: req.headers['user-agent'],
     });
 
+    // Set access token as cookie for resilience across page navigations
+    res.cookie('accessToken', result.accessToken, {
+      httpOnly: false,
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    });
+
     res.status(200).json(result);
   } catch (err) {
     auditService.log('login_failed', 'session', req.body.email, req.body.email, req.correlationId, null, null, {

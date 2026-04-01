@@ -18,10 +18,10 @@ export class VersionHistoryPage {
     this.diffAdditions = page.locator('[data-testid="diff-addition"], .diff-add, .line-added');
     this.diffDeletions = page.locator('[data-testid="diff-deletion"], .diff-remove, .line-removed');
     this.restoreButton = page.getByRole('button', { name: /restore/i });
-    this.diffStats = page.getByText(/addition|deletion/i);
+    this.diffStats = page.getByText(/addition|deletion/i).first();
   }
 
   async expectDiffVisible() {
-    await expect(this.page.getByText(/comparing|diff|changes/i)).toBeVisible();
+    await expect(this.page.getByText(/comparing|diff|changes/i).first()).toBeVisible();
   }
 }

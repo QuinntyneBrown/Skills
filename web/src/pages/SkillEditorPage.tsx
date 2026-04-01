@@ -11,7 +11,7 @@ interface SkillData {
   id: string;
   name: string;
   description: string | null;
-  content: string;
+  body: string;
   tags: string[];
   visibility: string;
   version: number;
@@ -81,14 +81,15 @@ export default function SkillEditorPage() {
     let cancelled = false;
     const fetchSkill = async () => {
       try {
-        const { data } = await api.get<SkillData>(`/skills/${id}`);
+        const res = await api.get<{ data: SkillData }>(`/skills/${id}`);
         if (cancelled) return;
-        setName(data.name);
-        setDescription(data.description || '');
-        setContent(data.content || '');
-        setTags(data.tags?.join(', ') || '');
-        setVisibility(data.visibility);
-        setVersion(data.version);
+        const skill = res.data.data;
+        setName(skill.name);
+        setDescription(skill.description || '');
+        setContent(skill.body || '');
+        setTags(skill.tags?.join(', ') || '');
+        setVisibility(skill.visibility);
+        setVersion(skill.version);
       } catch {
         showToast('error', 'Failed to load skill');
         navigate('/dashboard');
@@ -105,29 +106,29 @@ export default function SkillEditorPage() {
     setNameError('');
     if (!name.trim()) {
       setNameError('Name is required');
-      showToast('warning', 'Skill name is required');
+      showToast('warning', 'Please enter a skill name');
       return;
     }
     if (name.trim().length > 200) {
       setNameError('Name must be 200 characters or fewer');
-      showToast('warning', 'Name is too long (max 200 characters)');
+      showToast('warning', 'Please shorten the name (max 200)');
       return;
     }
     setSaving(true);
     try {
-      const payload = {
+      const basePayload = {
         name: name.trim(),
         description: description.trim() || null,
-        content,
+        body: content?.trim() ? content : '(empty)',
         tags: tags.split(',').map((t) => t.trim()).filter(Boolean),
         visibility,
       };
       if (isNew) {
-        const { data } = await api.post<SkillData>('/skills', payload);
+        const res = await api.post<{ data: SkillData }>('/skills', basePayload);
         showToast('success', 'Skill created');
-        navigate(`/skills/${data.id}/edit`, { replace: true });
+        navigate(`/skills/${res.data.data.id}/edit`, { replace: true });
       } else {
-        await api.patch(`/skills/${id}`, payload);
+        await api.patch(`/skills/${id}`, { ...basePayload, version });
         setVersion((v) => v + 1);
         showToast('success', 'Skill saved');
       }
@@ -137,7 +138,7 @@ export default function SkillEditorPage() {
     } finally {
       setSaving(false);
     }
-  }, [name, description, content, tags, visibility, isNew, id, navigate, showToast]);
+  }, [name, description, content, tags, visibility, isNew, id, version, navigate, showToast]);
 
   // Ctrl+S shortcut
   useEffect(() => {
@@ -184,7 +185,7 @@ export default function SkillEditorPage() {
   return (
     <div className={styles.layout}>
       <div className={styles.sidebarDesktop}>
-        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} skillId={isNew ? undefined : id} />
       </div>
 
       <div className={styles.main}>
@@ -204,6 +205,17 @@ export default function SkillEditorPage() {
             <span className={styles.topBarTitle}>{name || 'New Skill'}</span>
           </div>
           <div className={styles.topBarRight}>
+            {!isNew && id && (
+              <button className={styles.shareBtn} onClick={() => navigate(`/skills/${id}/versions`)} aria-label="View versions">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="6" y1="3" x2="6" y2="15" />
+                  <circle cx="18" cy="6" r="3" />
+                  <circle cx="6" cy="18" r="3" />
+                  <path d="M18 9a9 9 0 0 1-9 9" />
+                </svg>
+                <span>History</span>
+              </button>
+            )}
             <button className={styles.shareBtn} onClick={() => setShareOpen(true)}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
@@ -220,7 +232,7 @@ export default function SkillEditorPage() {
 
         {/* Metadata Bar */}
         <div className={styles.meta}>
-          <span className={styles.metaBadge}>skill.md</span>
+          <span className={styles.metaBadge}>markdown</span>
           {!isNew && <span className={styles.metaBadgeAccent}>v{version}</span>}
           <span className={visibilityBadgeClass}>{visibility}</span>
           <span className={styles.metaBadge}>{content.length} chars</span>

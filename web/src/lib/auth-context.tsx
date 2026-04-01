@@ -23,7 +23,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const token = sessionStorage.getItem('accessToken');
+    let token = sessionStorage.getItem('accessToken');
+    // Fall back to cookie if sessionStorage doesn't have the token
+    if (!token) {
+      const match = document.cookie.match(/(?:^|;\s*)accessToken=([^;]*)/);
+      if (match) {
+        token = decodeURIComponent(match[1]);
+        sessionStorage.setItem('accessToken', token);
+      }
+    }
     if (token) {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
@@ -58,6 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // ignore errors on logout
     }
     sessionStorage.clear();
+    document.cookie = 'accessToken=; path=/; max-age=0';
     setUser(null);
   };
 

@@ -23,7 +23,7 @@ export class SkillEditorPage {
     this.saveButton = page.getByRole('button', { name: /save|create/i });
     this.statusBar = page.locator('[data-testid="editor-status"], .editor-status, .status-bar');
     this.lineColInfo = page.getByText(/ln.*col|line.*column/i);
-    this.charCount = page.getByText(/chars|characters/i);
+    this.charCount = page.locator('[data-testid="editor-status"], .editor-status, .status-bar').getByText(/chars|characters/i);
     this.previewPane = page.locator('[data-testid="preview-pane"], .preview-pane');
     this.editorTab = page.getByRole('tab', { name: /editor/i });
     this.previewTab = page.getByRole('tab', { name: /preview/i });

@@ -24,13 +24,13 @@ export default function RegisterPage() {
     setError('');
     setSuccess('');
 
-    if (password !== confirmPassword) {
-      setError('Passwords do not match.');
+    if (password.length < 12) {
+      setError('Password must be at least 12 characters for complexity requirements.');
       return;
     }
 
-    if (password.length < 12) {
-      setError('Password must be at least 12 characters for complexity requirements.');
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
       return;
     }
 
@@ -84,7 +84,7 @@ export default function RegisterPage() {
           {error && <div className={styles.errorMessage}>{error}</div>}
           {success && <div className={styles.successMessage}>{success}</div>}
 
-          <form className={styles.form} onSubmit={handleSubmit}>
+          <form className={styles.form} onSubmit={handleSubmit} noValidate>
             <div className={styles.fieldGroup}>
               <label className={styles.label} htmlFor="email">Email</label>
               <input

@@ -79,6 +79,13 @@ export class SkillRepository {
     return queryOne<Skill>('SELECT * FROM skills WHERE id = $1', [id]);
   }
 
+  async findByOwnerAndName(ownerId: string, name: string): Promise<Skill | null> {
+    return queryOne<Skill>(
+      'SELECT * FROM skills WHERE owner_id = $1 AND name = $2 AND deleted_at IS NULL',
+      [ownerId, name]
+    );
+  }
+
   async findAll(filters: SkillFilters): Promise<SkillListResult> {
     const params: any[] = [];
     const conditions: string[] = ['s.deleted_at IS NULL'];

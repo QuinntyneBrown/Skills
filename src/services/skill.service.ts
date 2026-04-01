@@ -13,15 +13,41 @@ export class SkillService {
 
     this.validateSkillInput(dto);
 
-    const skill = await skillRepository.insert({
-      ownerId: userId,
-      name: dto.name,
-      description: dto.description,
-      body: dto.body,
-      visibility: dto.visibility,
-      tags: dto.tags,
-      createdBy: userId,
-    });
+    let skill: Skill;
+    try {
+      skill = await skillRepository.insert({
+        ownerId: userId,
+        name: dto.name,
+        description: dto.description,
+        body: dto.body,
+        visibility: dto.visibility,
+        tags: dto.tags,
+        createdBy: userId,
+      });
+    } catch (err: any) {
+      // Handle unique constraint violation (PostgreSQL error code 23505)
+      if (err.code === '23505') {
+        // Soft-delete the existing skill with the same name and retry
+        const existing = await skillRepository.findByOwnerAndName(userId, dto.name);
+        if (existing) {
+          await skillRepository.softDelete(existing.id);
+          await cacheService.invalidateSkill(existing.id);
+          skill = await skillRepository.insert({
+            ownerId: userId,
+            name: dto.name,
+            description: dto.description,
+            body: dto.body,
+            visibility: dto.visibility,
+            tags: dto.tags,
+            createdBy: userId,
+          });
+        } else {
+          throw new ConflictError(`A skill with the name "${dto.name}" already exists`);
+        }
+      } else {
+        throw err;
+      }
+    }
 
     await cacheService.invalidateSkill(skill.id);
 

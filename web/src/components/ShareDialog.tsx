@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import styles from './ShareDialog.module.css';
 
 interface SharedUser {
@@ -43,11 +44,12 @@ export default function ShareDialog({ skillName, visibility, onVisibilityChange,
     onSave(localVisibility, sharedUsers);
   };
 
-  return (
-    <div className={styles.overlay} onClick={onClose}>
+  return createPortal(
+    <div className={styles.overlay} onClick={onClose} role="dialog" aria-modal="true" aria-label={`Share Skill: ${skillName}`}>
+
       <div className={styles.dialog} onClick={(e) => e.stopPropagation()} style={{ position: 'relative' }}>
         <div className={styles.header}>
-          <h3 className={styles.title}>Share &apos;{skillName}&apos;</h3>
+          <h3 className={styles.title}>Share Skill: {skillName}</h3>
           <p className={styles.subtitle}>Control who can view and edit this skill</p>
           <button className={styles.closeBtn} onClick={onClose} aria-label="Close">&times;</button>
         </div>
@@ -137,6 +139,7 @@ export default function ShareDialog({ skillName, visibility, onVisibilityChange,
           <button className={styles.saveBtn} onClick={handleSave}>Save Changes</button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

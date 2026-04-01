@@ -51,6 +51,6 @@ export class LoginPage {
 
   async expectRedirectToDashboard() {
     await expect(this.page).toHaveURL(/dashboard/);
-    await expect(this.page.getByText('Dashboard')).toBeVisible();
+    await expect(this.page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
   }
 }

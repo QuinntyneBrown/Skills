@@ -45,7 +45,7 @@ export class DashboardPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.heading = page.getByText('Dashboard');
+    this.heading = page.getByRole('heading', { name: 'Dashboard' });
     this.subtitle = page.getByText(/manage and organize/i);
 
     this.sidebarMySkills = page.getByText('My Skills');
@@ -66,9 +66,9 @@ export class DashboardPage {
     this.filterButton = page.getByRole('button', { name: /filter/i });
     this.sortButton = page.getByRole('button', { name: /sort/i });
 
-    this.totalSkillsStat = page.getByText('Total Skills');
-    this.sharedStat = page.getByText('Shared');
-    this.recentEditsStat = page.getByText('Recent Edits');
+    this.totalSkillsStat = page.getByText('Total Skills').first();
+    this.sharedStat = page.getByText('Shared', { exact: true }).first();
+    this.recentEditsStat = page.getByText('Recent Edits').first();
 
     this.paginationInfo = page.getByText(/showing|page/i);
 

@@ -13,13 +13,13 @@ export class ShareDialog {
 
   constructor(page: Page) {
     this.page = page;
-    this.heading = page.getByText(/share.*skill/i);
-    this.publicOption = page.getByText('Public');
-    this.sharedOption = page.getByText('Shared');
-    this.privateOption = page.getByText('Private');
+    this.heading = page.getByRole('heading', { name: /share.*skill/i });
+    this.publicOption = page.getByText('Public', { exact: true });
+    this.sharedOption = page.getByText('Shared', { exact: true });
+    this.privateOption = page.getByText('Private', { exact: true });
     this.emailInput = page.getByPlaceholder(/email/i);
     this.shareWithPeopleSection = page.getByText(/share with people/i);
-    this.saveButton = page.getByRole('button', { name: /save|apply/i });
+    this.saveButton = page.getByRole('button', { name: /save changes/i });
     this.cancelButton = page.getByRole('button', { name: /cancel/i });
   }
 }

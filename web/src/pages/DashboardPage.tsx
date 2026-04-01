@@ -32,6 +32,8 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Skill | null>(null);
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [sortOpen, setSortOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { showToast } = useToast();
@@ -120,17 +122,51 @@ export default function DashboardPage() {
         <div className={styles.toolbar}>
           <form onSubmit={handleSearch} className={styles.searchForm}>
             <svg className={styles.searchIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--foreground-muted)" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            <input name="q" type="text" placeholder="Search skills by name, tag, or keyword..." className={styles.searchInput} defaultValue={query} />
+            <input name="q" type="text" placeholder="Search skills by name or keyword..." className={styles.searchInput} defaultValue={query} />
           </form>
           <div className={styles.toolbarActions}>
-            <button className={styles.toolbarBtn} aria-label="Filter">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
-              Filters
-            </button>
-            <button className={styles.toolbarBtn} aria-label="Sort">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m3 16 4 4 4-4"/><path d="M7 20V4"/><path d="m21 8-4-4-4 4"/><path d="M17 4v16"/></svg>
-              Sort
-            </button>
+            <div style={{ position: 'relative' }}>
+              <button className={styles.toolbarBtn} aria-label="Filter" onClick={() => { setFilterOpen(!filterOpen); setSortOpen(false); }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                Filters
+              </button>
+              {filterOpen && (
+                <div className={styles.dropdown}>
+                  <label className={styles.dropdownLabel}>Filter by tag</label>
+                  <input
+                    type="text"
+                    placeholder="Enter tag to filter..."
+                    className={styles.dropdownInput}
+                    defaultValue={tags}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        const val = (e.target as HTMLInputElement).value;
+                        setSearchParams((prev) => {
+                          if (val) prev.set('tags', val); else prev.delete('tags');
+                          prev.set('page', '1');
+                          return prev;
+                        });
+                        setFilterOpen(false);
+                      }
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+            <div style={{ position: 'relative' }}>
+              <button className={styles.toolbarBtn} aria-label="Sort" onClick={() => { setSortOpen(!sortOpen); setFilterOpen(false); }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m3 16 4 4 4-4"/><path d="M7 20V4"/><path d="m21 8-4-4-4 4"/><path d="M17 4v16"/></svg>
+                Sort
+              </button>
+              {sortOpen && (
+                <div className={styles.dropdown}>
+                  <button className={styles.dropdownItem} onClick={() => { setSearchParams((p) => { p.set('sort', 'name'); p.set('order', 'asc'); return p; }); setSortOpen(false); }}>Name (A-Z)</button>
+                  <button className={styles.dropdownItem} onClick={() => { setSearchParams((p) => { p.set('sort', 'name'); p.set('order', 'desc'); return p; }); setSortOpen(false); }}>Name (Z-A)</button>
+                  <button className={styles.dropdownItem} onClick={() => { setSearchParams((p) => { p.set('sort', 'updated_at'); p.set('order', 'desc'); return p; }); setSortOpen(false); }}>Date Updated (newest)</button>
+                  <button className={styles.dropdownItem} onClick={() => { setSearchParams((p) => { p.set('sort', 'updated_at'); p.set('order', 'asc'); return p; }); setSortOpen(false); }}>Date Updated (oldest)</button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -182,7 +218,7 @@ export default function DashboardPage() {
                       <td><span className={`${styles.visBadge} ${styles[`vis${skill.visibility}`]}`}>{skill.visibility}</span></td>
                       <td className={styles.dateCell}>{formatDate(skill.updated_at)}</td>
                       <td>
-                        <button className={styles.actionBtn} data-testid="delete-action" aria-label="Delete skill" onClick={(e) => { e.stopPropagation(); setDeleteTarget(skill); }}>
+                        <button className={styles.actionBtn} data-testid="delete-action" aria-label="Remove skill" onClick={(e) => { e.stopPropagation(); setDeleteTarget(skill); }}>
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
                         </button>
                       </td>
